@@ -4,7 +4,7 @@ var apiUrl = process.env.URL;
  
 frisby.create('POST login')
     .post(apiUrl + '/login', {
-        name: 'test',
+        name:     'test',
         password: 'test'
     }, {
         json: true
@@ -12,11 +12,9 @@ frisby.create('POST login')
     .expectStatus(200)
     .after(function(body, res) {
         var setCookie = res.headers['set-cookie'];
-        var cookie = '';
+        var cookie =    '';
 
-        console.log('SetCookie:---------- ' + setCookie);
         var setCookie2 = [setCookie[0], setCookie[2]];
-        console.log('SetCookie2:---------- ' + setCookie2);
 
         if (Array.isArray(setCookie2)) {
             for (var i = 0, len = setCookie2.length; i < len; i++) {
@@ -32,8 +30,8 @@ frisby.create('POST login')
             .get(apiUrl + '/me', {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Cookie': cookie,
+                    'Accept':       'application/json',
+                    'Cookie':       cookie,
                 }
             })
             .inspectJSON()
