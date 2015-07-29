@@ -5,6 +5,7 @@ if(!defined('VALID_INCLUDE')) {
 }
 
 function setProgressViewed($unit) {
+	check_logged_in();
 	global $mysqli, $user;
 	// then for unit
 	$sql = 'INSERT INTO UnitProgress (userId,unitId,correct,layers,viewed)
@@ -31,6 +32,7 @@ function setProgressViewed($unit) {
 }
 
 function setProgress($layer, $time, $success,$score) {
+	check_logged_in();
 	global $mysqli, $user;
 	
 	$userid = $user->userid();
@@ -88,6 +90,7 @@ function setProgress($layer, $time, $success,$score) {
 }
 
 function updateChannels($id, $unit=false) {
+	check_logged_in();
 	global $user,$mysqli;
 	$channelquery = $unit === true ? 'SELECT channelId FROM ChannelUnits WHERE unitId = ?' : 'SELECT parent FROM Channels WHERE id = ?';
 
@@ -149,6 +152,7 @@ function updateChannels($id, $unit=false) {
 }
 
 function getProgressChannel($channel, $verbose=true) {
+	check_logged_in();
 	global $mysqli, $user;
 
 	$sql = 'SELECT progress FROM ChannelProgress WHERE channelId=? AND userId=?';
@@ -174,6 +178,7 @@ function getProgressChannel($channel, $verbose=true) {
 }
 
 function getProgressUnit($unit, $details = false, $verbose=true) {
+	check_logged_in();
 	global $mysqli, $user;
 
 	$sql = 'SELECT correct, layers FROM UnitProgress WHERE unitId=? AND userId=?';

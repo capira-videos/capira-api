@@ -23,5 +23,7 @@ define('LOGGED_OUT', 13);
 
 // Error Messages
 define('NOT_PERMITTED', '{"error": "You are not permitted to do this operation!"}');
+define('NOT_LOGGED_IN', '{"error": "You are not logged in!"}');
+
 
 ?>

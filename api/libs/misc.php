@@ -30,6 +30,15 @@ function check_unit_privileges($id, $level)
 	}
 }
 
+function check_logged_in(){
+	global $user;
+	if(!$user->logged_in()&&! ($user->userid()>0)) {
+		header("HTTP/1.1 401 Unauthorized");
+		echo NOT_LOGGED_IN;
+		exit;
+	}
+}
+
 function random_0_1()
 {   // auxiliary function
     // returns random number with flat distribution from 0 to 1
