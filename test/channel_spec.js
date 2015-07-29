@@ -1,8 +1,9 @@
+'use strict';
 var frisby = require('frisby');
-var URL = process.env.URL
+var url = process.env.URL;
 
 frisby.create('GET channel 1')
-  .get(URL + '/channel/1')
+  .get(url + '/channel/1')
   .expectStatus(200)
   .expectHeaderContains('content-type', 'text/html;charset=UTF-8')
   .expectJSON({
