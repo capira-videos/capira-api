@@ -4,9 +4,8 @@ var apidoc = require('gulp-apidoc');
 
 gulp.task('apidoc', function(cb) {
     apidoc.exec({
-        src: "server/SwaggerServer/",
-        dest: "server/docs/",
-        includeFilters: [".*.php$"]
+        src:  "api/routes/",
+        dest: "docs/"
     }, cb);
 });
 
