@@ -1,7 +1,6 @@
-==Install tools
-
-To Test the API you need jasmine-node:
+##Install tools
+To test the API you need jasmine-node:
 `npm install jasmine-node -g`
 
-Run Test by jasmine-node tests 
-`jasmine-node test`
+##Run tests
+`jasmine-node --config URL "http://<THE API SERVER URL>" test`
