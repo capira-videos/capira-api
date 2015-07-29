@@ -20,4 +20,8 @@ define('SUCCESS_REGISTER', 43);
 define('FAILED', -42);
 define('LOGGED_OUT', 13);
 
+
+// Error Messages
+define('NOT_PERMITTED', '{"error": "You are not permitted to do this operation!"}');
+
 ?>

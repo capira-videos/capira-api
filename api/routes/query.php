@@ -4,7 +4,7 @@
  *
  * @api {GET} /query/users/:query 		Query for Users
  * @apiName queryForUsers
- * @apiGroup Query-API
+ * @apiGroup Query
  * @apiPermission logged-in
  * 
  */
@@ -18,9 +18,9 @@ $app->get('/query/users/:query', function ($query) use ($user){
  *
  * @api {GET} /query/content/:query 	Query Content
  * @apiName queryForContent
- * @apiGroup Query-API
+ * @apiGroup Query
  * @apiPermission logged-in
- * @description Querys for Units and Folders.
+ * @apiDescription Querys for Units and Folders.
  * 
  */
 $app->get('/query/content/:query(:/page)', function ($query) use ($user,$page=0){

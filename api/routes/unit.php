@@ -5,7 +5,7 @@ include_once 'libs/unit.php';
 /**
  * @api {GET} /unit/:id 	Fetch a Unit by Id
  * @apiName fetchUnitById
- * @apiGroup Unit-API
+ * @apiGroup Unit
  *
  * @apiParam {Number} id 	Units unique ID.
  *
@@ -19,7 +19,7 @@ $app->get('/unit/:id(/:folder)', function ($id, $folder=0) {
 /**
  * @api {POST} /unit/	 	Create a Unit 
  * @apiName createUnit
- * @apiGroup Unit-API
+ * @apiGroup Unit
  *
  *
  * @apiSuccess {Unit} Unit 	Unit
@@ -34,7 +34,7 @@ $app->post('/unit/', function ($id) {
 /**
  * @api {PUT} /unit/	 	Update a Unit 
  * @apiName updateUnit
- * @apiGroup Unit-API
+ * @apiGroup Unit
  *
  *
  * @apiSuccess {Unit} Unit 	Unit

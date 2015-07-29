@@ -14,7 +14,8 @@ function check_channel_privileges($id, $level)
 {
 	global $user;
 	if(!$user->has_privilege($id, $level, true)) {
-		echo 'Sie haben leider keine Rechte hierfür. <a href="javascript:history.back()">Zurück</a>';
+		header("HTTP/1.1 401 Unauthorized");
+		echo NOT_PERMITTED;
 		exit;
 	}
 }
@@ -23,7 +24,8 @@ function check_unit_privileges($id, $level)
 {
 	global $user;
 	if(!$user->has_privilege($id, $level, false)) {
-		echo 'Sie haben leider keine Rechte hierfür. <a href="javascript:history.back()">Zurück</a>';
+		header("HTTP/1.1 401 Unauthorized");
+		echo NOT_PERMITTED;
 		exit;
 	}
 }

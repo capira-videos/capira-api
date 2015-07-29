@@ -1,9 +1,9 @@
 <?php
 /**
  *
- * @api {POST} /user/login Log into Capira User Account
+ * @api {POST} /login Log into Capira Account
  * @apiName login
- * @apiGroup User-API
+ * @apiGroup User
  *
  * @apiParam {String} name 		Username of the Account
  * @apiParam {String} password 	Password of the Account
@@ -12,7 +12,7 @@
  * @apiPermission none
  *
  */
-$app->post('/user/login', function () use ($user) {
+$app->post('/login', function () use ($user) {
 	$request = json_decode(file_get_contents("php://input"), true);
     echo $user->login($request['name'], $request['password']);
 });
@@ -20,22 +20,22 @@ $app->post('/user/login', function () use ($user) {
 
 /**
  *
- * @api {POST} /user/logout Log out of Capira User Account
+ * @api {POST} /logout Log out of Capira Account
  * @apiName logout
- * @apiGroup User-API
+ * @apiGroup User
  *
  * @apiPermission none
  *
  */
-$app->post('/user/logout', function () use ($user) {
+$app->post('/logout', function () use ($user) {
 	echo $user->logout();
 });
 
 /**
  *
- * @api {POST} /user/register Create a Capira User Account
+ * @api {POST} /register Create a Capira Account
  * @apiName create
- * @apiGroup User-API
+ * @apiGroup User
  *
  * @apiParam {String} email 	Password of the Account
  * @apiParam {String} name 		Username of the Account
@@ -45,20 +45,20 @@ $app->post('/user/logout', function () use ($user) {
  * @apiPermission none
  *
  */
-$app->post('/user/register', function () use ($user) {
+$app->post('/register', function () use ($user) {
 	$request = json_decode(file_get_contents("php://input"), true);
 	echo $user->register($request['name'], $request['email'], $request['password']);
 });
 
 /**
  *
- * @api {GET} /user/profile 	Fetch profile
+ * @api {GET} /me 	Fetch profile
  * @apiName fetchProfile
- * @apiGroup User-API
+ * @apiGroup User
  * @apiPermission logged-in
  * 
  */
-$app->get('/user/profile', function () use ($user){
+$app->get('/me', function () use ($user){
 	echo $user->json_object();
 });
 
