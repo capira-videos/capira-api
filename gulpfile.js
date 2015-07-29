@@ -1,12 +1,13 @@
 'use strict';
 var gulp = require('gulp');
 var apidoc = require('gulp-apidoc');
- 
-gulp.task('apidoc', function(cb){
-          apidoc.exec({
-            src: "server/api",
-            dest: "server/docs/"
-          }, cb);
+
+gulp.task('apidoc', function(cb) {
+    apidoc.exec({
+        src: "server/SwaggerServer/",
+        dest: "server/docs/",
+        includeFilters: [".*.php$"]
+    }, cb);
 });
 
 /*

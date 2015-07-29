@@ -1,3 +1,4 @@
 node_modules
 dist
-server/docs
+api/vendor
+npm-debug.log
