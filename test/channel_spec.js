@@ -1,5 +1,4 @@
 var frisby = require('frisby');
-var cfg = require('./config.js');
 var URL = process.env.URL
 
 frisby.create('GET channel 1')
