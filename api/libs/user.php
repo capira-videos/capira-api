@@ -237,9 +237,7 @@ class User {
 	public function register($name, $email, $password) {
 		global $mysqli;
 
-		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			return INVALID_EMAIL;
-		}
+		check_valid_email($email);
 
 		$loginpw = $password;
 		$password = password_hash($password, PASSWORD_DEFAULT);
@@ -252,7 +250,9 @@ class User {
 		$stmt->execute();
 		$stmt->bind_result($id);
 		if ($stmt->fetch()) {
-			return DUPLICATE_NAME;
+			header("HTTP/1.1 406 Not Acceptable");
+			echo NOT_NAME_UNIQUE;
+			exit;
 		}
 
 		$stmt->close();
@@ -278,10 +278,12 @@ class User {
 		if ($res) {
 			$this->login($name, $loginpw);
 			unset($loginpw);
-			return SUCCESS_REGISTER;
+			return $this;
 		}
 
-		return DUPLICATE_EMAIL;
+		header("HTTP/1.1 406 Not Acceptable");
+		echo NOT_EMAIL_UNIQUE;
+		exit;
 	}
 
 	/**

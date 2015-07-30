@@ -39,6 +39,14 @@ function check_logged_in(){
 	}
 }
 
+function check_valid_email($email){
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		header("HTTP/1.1 406 Not Acceptable");
+		echo NOT_VALID_EMAIL;
+		exit;
+	}
+}
+
 function random_0_1()
 {   // auxiliary function
     // returns random number with flat distribution from 0 to 1
