@@ -1,6 +1,6 @@
 <?php
 
-if(!defined('VALID_INCLUDE')) {
+if (!defined('VALID_INCLUDE')) {
 	exit;
 }
 
@@ -26,14 +26,14 @@ function insertUnitInPlaylist($unitId, $folderId) {
 
 function insertUnitIfNotExists($title, $videoId, $tags, $authorId) {
 	global $mysqli;
-	
+
 	$query = "SELECT * FROM Units WHERE videoId=?";
 	$stmt = $mysqli->prepare($query);
 	$stmt->bind_param('s', $videoId);
 	$stmt->execute();
-	
+
 	// exists
-	if($stmt->fetch()) {
+	if ($stmt->fetch()) {
 		$stmt->close();
 		return false;
 	}
@@ -47,7 +47,7 @@ function insertUnitIfNotExists($title, $videoId, $tags, $authorId) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("sss", $title, $videoId,$authorId)) {
+	if (!$stmt->bind_param("sss", $title, $videoId, $authorId)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -62,17 +62,17 @@ function insertUnitIfNotExists($title, $videoId, $tags, $authorId) {
 
 function insertAuthor($userId, $userName) {
 	global $mysqli;
-	
+
 	$query = "SELECT id FROM Authors WHERE ytId=?";
 	$stmt = $mysqli->prepare($query);
 	$stmt->bind_param('s', $userId);
 	$stmt->execute();
-	
+
 	$id = -1;
 	$stmt->bind_result($id);
-	
+
 	// exists
-	if($stmt->fetch()) {
+	if ($stmt->fetch()) {
 		$stmt->close();
 		return $id;
 	}
@@ -96,22 +96,22 @@ function insertAuthor($userId, $userName) {
 	$id = $stmt->insert_id;
 	$stmt->close();
 
-	return $id;	
+	return $id;
 }
 
 function insertPlaylist($ytPlaylistId, $title, $description, $authorId, $tags, $parent) {
 	global $mysqli;
-	
+
 	$query = "SELECT id FROM Channels WHERE ytId=?";
 	$stmt = $mysqli->prepare($query);
 	$stmt->bind_param('s', $ytPlaylistId);
 	$stmt->execute();
-	
+
 	$id = -1;
 	$stmt->bind_result($id);
-	
+
 	// exists
-	if($stmt->fetch()) {
+	if ($stmt->fetch()) {
 		$stmt->close();
 		return $id;
 	}

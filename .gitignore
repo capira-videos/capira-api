@@ -1,7 +1,7 @@
 node_modules
 dist
-api/vendor
 docs
+api/vendor
 npm-debug.log
 reports
 test/reports

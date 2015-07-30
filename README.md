@@ -12,5 +12,8 @@ To test the API you need jasmine-node:
 ##Run Tests
 `jasmine-node --config URL "http://<THE API SERVER URL>" test`
 
+##Build Project for Deployment
+`gulp`
+
 ##Generate Documentation
 `gulp apidoc`
