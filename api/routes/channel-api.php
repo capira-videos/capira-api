@@ -1,5 +1,11 @@
 <?php
 
+/**
+ *
+ * @apiDefine Unauthorized Operation 
+ *
+ */
+
 include_once 'libs/channel.php';
 
 /**
@@ -40,7 +46,7 @@ $app->get('/channel/:id', function ($id) {
  *     }
  *
  * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 200 OK
+ *     HTTP/1.1 201 OK
  *     {
  *       "title": "Capira Channel",
  *       "id": "42",

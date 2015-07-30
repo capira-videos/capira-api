@@ -1,15 +1,17 @@
 <?php
+
 /**
+ *
  *
  * @api {POST} /signup Create a Capira Account
  * @apiName create
  * @apiGroup User
  *
- * @apiParam {String} email 	Password of the Account
- * @apiParam {String} name 		Username of the Account
- * @apiParam {String} password 	Password of the Account
+ * @apiParam {String} email 		Password of the Account
+ * @apiParam {String} name 			Username of the Account
+ * @apiParam {String} password 		Password of the Account
  *
- * @apiSuccess {User} User The User 
+ * @apiSuccess (Created 201) {User} User 	The created User 
  * @apiPermission none
  * @apiDescription Create a Capira Account. If successful, you are logged in. name and password must be unique.   
  * @apiParamExample {json} Request-Example:
@@ -20,7 +22,7 @@
  *     }
  *
  * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 200 SUCCESS
+ *     HTTP/1.1 201 Created
  *     {
  *       "name": "CapiraUser",
  *       "id": "12",
@@ -28,17 +30,31 @@
  *     }
  * 
  * @apiErrorExample {json} Error-Response:
- *     HTTP/1.1 401 Unauthorized
+ *     HTTP/1.1 406 Not Acceptable
  *     {
- *       "error": "You are not permitted to do this operation!"
+ *       "error": "This name already exists!"
+ *     }
+ *
+ * @apiErrorExample {json} Error-Response:
+ *     HTTP/1.1 406 Not Acceptable
+ *     {
+ *       "error": "This is not a valid Email address!"
+ *     }
+ *
+ * @apiErrorExample {json} Error-Response:
+ *     HTTP/1.1 406 Not Acceptable
+ *     {
+ *       "error": "This email address is already in use!"
  *     }
  *
  */
 $app->post('/signup', function () use ($user) {
 	$request = json_decode(file_get_contents("php://input"), true);
-	echo $user->register($request['name'], $request['email'], $request['password']);
+	$user->register($request['name'], $request['email'], $request['password']);
+	header("HTTP/1.1 201 Created");
+	echo $user->json_object();
+	exit;
 });
-
 
 
 

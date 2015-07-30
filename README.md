@@ -1,4 +1,8 @@
-##Install Tools
+##Install PHP Dependencies
+In directory "/api" run:
+`php composer.phar install`
+
+##Install Development Tools
 Install local dev-dependencies:
 `npm install`
 

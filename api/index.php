@@ -5,9 +5,9 @@ $app = new \Slim\Slim();
 
 include_once 'common.php';
 
-include_once 'routes/user.php';
-include_once 'routes/channel.php';
-include_once 'routes/unit.php';
+include_once 'routes/user-api.php';
+include_once 'routes/channel-api.php';
+include_once 'routes/unit-api.php';
 
 $app->run();
 
