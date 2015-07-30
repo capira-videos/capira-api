@@ -3,3 +3,5 @@ dist
 api/vendor
 docs
 npm-debug.log
+reports
+test/reports
