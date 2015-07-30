@@ -21,7 +21,7 @@
  */
 $app->get('/channel/:id', function ($id) {
 	include_once 'libs/channel.php';
-	getFolder($id);
+	echo json_encode(getFolder($id));
 });
 
 /**
@@ -61,7 +61,7 @@ $app->get('/channel/:id', function ($id) {
 $app->post('/channel/', function () {
 	include_once 'libs/channel.php';
 	$folder = get_request_json();
-	createFolder($folder);
+	echo json_encode(createFolder($folder));
 });
 
 /**
@@ -86,10 +86,10 @@ $app->post('/channel/', function () {
  *     }
  *
  */
-$app->put('/channel/', function () {
+$app->put('/channel', function () {
 	include_once 'libs/channel.php';
 	$folder = get_request_json();
-	updateFolder($folder);
+	echo json_encode(updateFolder($folder));
 });
 
 /**
