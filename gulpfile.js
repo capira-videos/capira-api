@@ -10,12 +10,18 @@ gulp.task('doc', function() {
 });
  
 gulp.task('clean', function () {
-    return gulp.src('dist/', {read: false})
+    return gulp.src(['dist/','!**/*/sftp-config.json'], {read: false})
         .pipe(clean());
 });
 
-gulp.task('default',['clean'],  function () {
-        return gulp.src(['api/**/*.php', 'api/**/.htaccess', '!api/tools/**/*', '!api/vendor/slim/slim/tests'], {
+gulp.task('default',  function () {
+        return gulp.src(['config/sftp-config.json'], {
+            base: 'config'
+        }).pipe(gulp.dest('dist/'));
+    });
+
+gulp.task('copy',['clean'],  function () {
+        return gulp.src(['api/**/*.php', '!api/vendor/slim/slim/tests/**/*', 'api/**/.htaccess', '!api/tools/**/*'], {
             base: 'api'
         }).pipe(gulp.dest('dist'));
     });
