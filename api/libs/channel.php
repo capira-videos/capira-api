@@ -4,14 +4,14 @@ if(!defined('VALID_INCLUDE')) {
 	exit;
 }
 
-function getUnits($id) {
+function getUnits($id,$fetchPermissions=false) {
 	global $mysqli, $user;
 
 	$query = "SELECT Units.id,Units.title,Units.videoId,Units.published,ChannelUnits.viewIndex,COALESCE(p.correct/p.layers,p.viewed) AS progress
 			  FROM ChannelUnits
 			  RIGHT JOIN Units ON (ChannelUnits.unitId=Units.id)
 			  LEFT JOIN UnitProgress p ON p.unitId = Units.id AND p.userId=?
-			  WHERE ChannelUnits.channelId=?".(isset($_GET['editor'])?"":" AND published=1")." ORDER BY ChannelUnits.viewIndex";
+			  WHERE ChannelUnits.channelId=?".($fetchPermissions?"":" AND published=1")." ORDER BY ChannelUnits.viewIndex";
 	$stmt = $mysqli->prepare($query);
 	$userid = $user->userid();
 	$stmt->bind_param("ii", $userid, $id);
@@ -21,7 +21,7 @@ function getUnits($id) {
 	$unit = get_result($stmt);
 
 	while ($stmt->fetch()) {
-		if (isset($_GET['editor'])) { //Call From Channel-Editor
+		if ($fetchPermissions) { /*Call From Channel-Editor*/
 			$unit['admin'] = $user->has_privilege($unit['id'], ADMIN, false);
 		}
 		$units[] = $unit;
@@ -157,7 +157,7 @@ function getFolder($id) {
 		$folder['parent_author'] = $user->has_privilege($folder['parent'], AUTHOR);
 	}
 
-	echo json_encode($folder);
+	return $folder;
 }
 
 // retrieves a thumbnail and caches it
@@ -258,7 +258,7 @@ function createFolder($folder) {
 
 	$stmt->close();
 
-	echo json_encode($folder);
+	return $folder;
 }
 
 
@@ -283,10 +283,11 @@ function deleteFolder($folderId){
 
 }
 
-function updateFolder() {
+function updateFolder($folder) {
 
-	$folder = json_decode(file_get_contents("php://input"),true);
 	check_channel_privileges($folder['id'], AUTHOR);
+
+	/* TODO: This doesn't make sense if user doesn't want to update the parent */
 	check_channel_privileges($folder['parent'], AUTHOR);
 
 	global $mysqli;
@@ -324,12 +325,11 @@ function updateFolder() {
 	}
 	$stmt->close();
 
-	echo json_encode($folder);
+	return $folder;
 }
 
 
-function update_unit() {
-	$unit = json_decode(file_get_contents("php://input"),true);
+function update_unit($unit) {
 	check_unit_privileges($unit['id'], UNIT_ADMIN);
 
 	if (isset($unit['deleted']) && $unit['deleted']) {
@@ -345,12 +345,10 @@ function update_unit() {
 	echo json_encode(updateUnit($unit));
 }
 
-function updateOrder() {
-	global $mysqli;
-
-	$folder = json_decode(file_get_contents("php://input"), true);
-
+function updateOrder($folder) {
 	check_channel_privileges($folder['id'], AUTHOR);
+
+	global $mysqli;
 
 	$query = "UPDATE Channels SET viewIndex=? WHERE id=?";
 	/* Prepared statement, stage 1: prepare */
@@ -400,7 +398,7 @@ function updateOrder() {
 
 	$stmt->close();
 
-	echo json_encode($folder);
+	return $folder;
 }
 
 ?>

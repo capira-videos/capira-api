@@ -1,19 +1,19 @@
 <?php
 
-if(!defined('VALID_INCLUDE')) {
+if (!defined('VALID_INCLUDE')) {
 	exit;
 }
 
-function queryString($query, $start=0, $limit=false) {
+function queryString($query, $start = 0, $limit = false) {
 	global $mysqli, $user;
-	
+
 	$terms = explode(' ', $query);
 	$userid = $user->userid();
 
 	$a_param_type = array('i');
 	$a_bind_params = array($userid);
 	$where_units = array();
-	foreach($terms as $term) {
+	foreach ($terms as $term) {
 		$likely = '%' . str_replace('%', '\%', $term) . '%';
 		$a_param_type[] = 's';
 		$a_bind_params[] = $likely;
@@ -31,7 +31,7 @@ function queryString($query, $start=0, $limit=false) {
 			LEFT JOIN UnitProgress p ON p.unitId = u.id AND p.userId=?
 			WHERE ' . implode(' AND ', $where_units);
 
-	if($limit !== false) {
+	if ($limit !== false) {
 		$limit = intval($limit);
 		$start = intval($start);
 		$sql .= ' LIMIT ' . $limit . ' OFFSET ' . $start;
@@ -42,16 +42,16 @@ function queryString($query, $start=0, $limit=false) {
 
 	$param_type = '';
 	$n = count($a_param_type);
-	for($i = 0; $i < $n; $i++) {
-	  $param_type .= $a_param_type[$i];
+	for ($i = 0; $i < $n; $i++) {
+		$param_type .= $a_param_type[$i];
 	}
 
 	/* with call_user_func_array, array params must be passed by reference */
-	$a_params[] = & $param_type;
+	$a_params[] = &$param_type;
 
-	for($i = 0; $i < $n; $i++) {
-	  /* with call_user_func_array, array params must be passed by reference */
-	  $a_params[] = & $a_bind_params[$i];
+	for ($i = 0; $i < $n; $i++) {
+		/* with call_user_func_array, array params must be passed by reference */
+		$a_params[] = &$a_bind_params[$i];
 	}
 
 	$stmt = $mysqli->prepare($sql);
@@ -78,7 +78,7 @@ function queryString($query, $start=0, $limit=false) {
 	$a_param_type = array('i');
 	$a_bind_params = array($userid);
 	$where_channels = array();
-	foreach($terms as $term) {
+	foreach ($terms as $term) {
 		$likely = '%' . str_replace('%', '\%', $term) . '%';
 		$a_param_type[] = 's';
 		$a_bind_params[] = $likely;
@@ -89,7 +89,6 @@ function queryString($query, $start=0, $limit=false) {
 		$where_channels[] = '(c.title LIKE ? OR c.description LIKE ? OR t.title LIKE ?)';
 	}
 
-
 	$sql = 'SELECT DISTINCT c.id, c.title, c.description, 0 AS viewIndex, tc.thumbnail, p.progress
 			FROM Channels c
 			LEFT JOIN ChannelTags m ON m.channelId = c.id
@@ -98,7 +97,7 @@ function queryString($query, $start=0, $limit=false) {
 			LEFT JOIN ChannelProgress p ON p.channelId = c.id AND p.userId=?
 			WHERE ' . implode(' AND ', $where_channels);
 
-	if($limit !== false) {
+	if ($limit !== false) {
 		$sql .= ' LIMIT ' . ($limit - $count_units); // no offset?
 	}
 
@@ -109,16 +108,16 @@ function queryString($query, $start=0, $limit=false) {
 
 	$param_type = '';
 	$n = count($a_param_type);
-	for($i = 0; $i < $n; $i++) {
-	  $param_type .= $a_param_type[$i];
+	for ($i = 0; $i < $n; $i++) {
+		$param_type .= $a_param_type[$i];
 	}
 
 	/* with call_user_func_array, array params must be passed by reference */
-	$a_params[] = & $param_type;
+	$a_params[] = &$param_type;
 
-	for($i = 0; $i < $n; $i++) {
-	  /* with call_user_func_array, array params must be passed by reference */
-	  $a_params[] = & $a_bind_params[$i];
+	for ($i = 0; $i < $n; $i++) {
+		/* with call_user_func_array, array params must be passed by reference */
+		$a_params[] = &$a_bind_params[$i];
 	}
 
 	$stmt = $mysqli->prepare($sql);

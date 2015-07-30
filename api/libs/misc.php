@@ -53,4 +53,8 @@ function random_0_1()
     return (float)rand()/(float)getrandmax();
 }
 
+function get_request_json(){
+	return json_decode(file_get_contents("php://input"),true);
+}
+
 ?>

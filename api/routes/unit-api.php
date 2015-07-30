@@ -1,6 +1,6 @@
 <?php
 
-include_once 'libs/unit.php';
+
 
 /**
  * @api {GET} /unit/:id 	Fetch a Unit by Id
@@ -13,6 +13,7 @@ include_once 'libs/unit.php';
  * 
  */
 $app->get('/unit/:id(/:folder)', function ($id, $folder=0) {
+	include_once 'libs/unit.php';
     echo json_encode(getUnit($id,$folder));
 });
 
@@ -27,6 +28,7 @@ $app->get('/unit/:id(/:folder)', function ($id, $folder=0) {
  * 
  */
 $app->post('/unit/', function ($id) {
+	include_once 'libs/unit.php';
     create_unit();
 });
 
@@ -43,6 +45,7 @@ $app->post('/unit/', function ($id) {
  *
  */
 $app->put('/unit/', function ($id) {
+	include_once 'libs/unit.php';
     update_unit();
 });
 

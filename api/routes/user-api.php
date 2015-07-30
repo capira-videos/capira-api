@@ -6,8 +6,9 @@
  * @api {POST} /signup Create a Capira Account
  * @apiName create
  * @apiGroup User
+ * @apiVersion 1.0.0
  *
- * @apiParam {String} email 		Password of the Account
+ * @apiParam {String} email 		Email Address of the Account
  * @apiParam {String} name 			Username of the Account
  * @apiParam {String} password 		Password of the Account
  *
@@ -63,6 +64,7 @@ $app->post('/signup', function () use ($user) {
  * @api {POST} /login Log into Capira Account
  * @apiName login
  * @apiGroup User
+ * @apiVersion 1.0.0
  *
  * @apiParam {String} name 		Username of the Account
  * @apiParam {String} password 	Password of the Account
@@ -82,6 +84,7 @@ $app->post('/login', function () use ($user) {
  * @api {POST} /logout Log out of Capira Account
  * @apiName logout
  * @apiGroup User
+ * @apiVersion 1.0.0
  *
  * @apiPermission Authenticated User
  *
@@ -97,7 +100,8 @@ $app->post('/logout', function () use ($user) {
  * @api {GET} /me 	Fetch profile
  * @apiName fetchProfile
  * @apiGroup User
- * @apiPermission logged-in
+ * @apiVersion 1.0.0
+ * @apiPermission Authenticated User
  * 
  */
 $app->get('/me', function () use ($user){

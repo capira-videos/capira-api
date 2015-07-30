@@ -2,11 +2,9 @@
 
 /**
  *
- * @apiDefine Unauthorized Operation 
+ * @apiDefine Unauthorized Operation
  *
  */
-
-include_once 'libs/channel.php';
 
 /**
  * @api {GET} /channel/:id Fetch a Channel by Id
@@ -22,9 +20,9 @@ include_once 'libs/channel.php';
  * @apiSampleRequest http://192.168.178.83:8888/api/channel/
  */
 $app->get('/channel/:id', function ($id) {
-    getFolder($id);
+	include_once 'libs/channel.php';
+	getFolder($id);
 });
-
 
 /**
  *
@@ -52,7 +50,7 @@ $app->get('/channel/:id', function ($id) {
  *       "id": "42",
  *       "parent": "314"
  *     }
- * 
+ *
  * @apiErrorExample {json} Error-Response:
  *     HTTP/1.1 401 Unauthorized
  *     {
@@ -61,8 +59,9 @@ $app->get('/channel/:id', function ($id) {
  *
  */
 $app->post('/channel/', function () {
-	$folder = json_decode(file_get_contents("php://input"),true);
-    createFolder($folder);
+	include_once 'libs/channel.php';
+	$folder = get_request_json();
+	createFolder($folder);
 });
 
 /**
@@ -85,13 +84,13 @@ $app->post('/channel/', function () {
  *       "units": [],
  *       "channels":[],
  *     }
- *  
+ *
  */
 $app->put('/channel/', function () {
-	$folder = json_decode(file_get_contents("php://input"),true);
-    updateFolder($folder);
+	include_once 'libs/channel.php';
+	$folder = get_request_json();
+	updateFolder($folder);
 });
-
 
 /**
  *
@@ -106,15 +105,13 @@ $app->put('/channel/', function () {
  *
  */
 $app->delete('/channel/:id', function ($id) {
+	include_once 'libs/channel.php';
 	deleteChannel($id);
 });
 
-
-$app->post('/channel/:id/sorting', function ($id) {
-    updateOrder();
+$app->put('/channel/:id/sorting', function ($id) {
+	include_once 'libs/channel.php';
+	updateOrder();
 });
-
-
-
 
 ?>

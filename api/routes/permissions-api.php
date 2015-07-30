@@ -26,6 +26,7 @@ $app->get('/permissions/channel/:id', function () use ($manager){
  *
  * @apiParam {Number} id 				Id of target Channel 
  * @apiPermission Admin of target Channel
+ * 
  *
  */
 $app->post('/permissions/channel', function () use ($manager){
