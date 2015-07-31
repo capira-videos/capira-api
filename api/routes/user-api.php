@@ -71,8 +71,8 @@ $app->post('/signup', function () use ($user) {
  * @apiPermission 	  none
  *
  */
-$app->post('/login', function () use ($user) {
-	$request = json_decode(file_get_contents("php://input"), true);
+$app->post('/login', function () use ($app, $user) {
+	$request = $app->request->getBody();
 	echo $user->login($request['name'], $request['password']);
 });
 

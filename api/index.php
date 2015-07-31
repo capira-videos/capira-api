@@ -8,13 +8,11 @@
 include_once 'common.php';
 
 require 'vendor/autoload.php';
-$app = new \Slim\Slim();
+require 'middleware.php';
 
-$view = $app->view();
-$view->setTemplatesDirectory('./templates/');
-$app->notFound(function () use ($app) {
-	$app->render('404.html');
-});
+$app = new \Slim\Slim();
+$app->add(new \Slim\middleware\ContentTypes());
+$app->contentType('application/json');
 
 include_once 'routes/user-api.php';
 include_once 'routes/channel-api.php';
