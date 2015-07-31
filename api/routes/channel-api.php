@@ -58,9 +58,9 @@ $app->get('/channel/:id', function ($id) {
  *     }
  *
  */
-$app->post('/channel/', function () {
+$app->post('/channel', function () use ($app) {
 	include_once 'libs/channel.php';
-	$folder = get_request_json();
+	$folder = $app->request->getBody();
 	echo json_encode(createFolder($folder));
 });
 
@@ -80,16 +80,40 @@ $app->post('/channel/', function () {
  *     {
  *       "title": "Capira Channel",
  *       "id": "42",
- *       "parent": "314",
- *       "units": [],
- *       "channels":[],
+ *       "published": "1",
  *     }
  *
  */
-$app->put('/channel', function () {
+$app->put('/channel', function () use ($app) {
 	include_once 'libs/channel.php';
-	$folder = get_request_json();
+	$folder = $app->request->getBody();
 	echo json_encode(updateFolder($folder));
+});
+
+/**
+ *
+ * @api {PUT} /channel/parent 		Update a channel parent
+ * @apiName updateChannelParent
+ * @apiGroup Channel
+ * @apiVersion 1.0.0
+ *
+ * @apiParam {Number} id   	    Id of the Channel
+ * @apiParam {Number} parent  	New Parent of the Channel
+ *
+ * @apiPermission Author of the Channel
+ * @apiSuccessExample {json} Success-Response:
+ *  HTTP/1.1 200 OK
+ *     {
+ *       "title": "Capira Channel",
+ *       "id": "42",
+ *       "published": "1",
+ *     }
+ *
+ */
+$app->put('/channel/parent', function () use ($app) {
+	include_once 'libs/channel.php';
+	$folder = $app->request->getBody();
+	echo json_encode(updateFolderParent($folder));
 });
 
 /**
@@ -100,13 +124,25 @@ $app->put('/channel', function () {
  * @apiVersion 1.0.0
  *
  * @apiParam {Number} id   			Id of Channel to delete
+ * @apiParamExample {json} Request-Example:
+ *     {
+ *       "id": "42",
+ *       "parent": "314"
+ *     }
  *
  * @apiPermission Author of the Parent Channel
  *
+ * @apiErrorExample {json} Error-Response:
+ *     HTTP/1.1 401 Unauthorized
+ *     {
+ *       "error": "You are not permitted to do this operation!"
+ *     }
+ *
  */
-$app->delete('/channel/:id', function ($id) {
+$app->delete('/channel', function () use ($app) {
+	$channel = $app->request->getBody();
 	include_once 'libs/channel.php';
-	deleteChannel($id);
+	deleteFolder($channel);
 });
 
 $app->put('/channel/:id/sorting', function ($id) {

@@ -18,6 +18,7 @@
     "process":   true,
     "expect":    true,
     "describe":  true,
-    "it":        true
+    "it":        true,
+    "beforeAll"  true
   }
 }

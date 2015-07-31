@@ -15,7 +15,7 @@
     "gulp-clean": "^0.3.1",
     "gulp-copy": "0.0.2",
     "jasmine-async-errors": "0.0.2",
-    "jasmine-expect": "^1.22.3",
+    "jasmine-expect": "^2.0.0-beta1",
     "request": "^2.60.0"
   },
   "scripts": {

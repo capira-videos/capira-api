@@ -5,7 +5,9 @@ var request = require('request');
 var user = require('./user_helper.js');
 
 var apiUrl = process.env.URL;
-apiUrl = apiUrl ? apiUrl : 'http://capira.de/build/api_v2';
+var defaultUrl = 'http://localhost:8888/api';
+//var defaultUrl = 'http://capira.de/build/api_v2';
+apiUrl = apiUrl ? apiUrl : defaultUrl;
 
 module.exports = {
     usersFactory: user(apiUrl),
@@ -18,7 +20,15 @@ module.exports = {
             headers: {
                 Cookie: user ? user.cookie : ''
             }
-        }, onResponse);
+        }, function(error, response, body){
+            if(response.statusCode===400 && response.statusCode===500){
+                console.log(
+                    '>>>>>>>>>>>>>>>>>>>>>>>>> BEGIN HTTP Error <<<<<<<<<<<<<<<<<<<<<<<<<\n\n'+
+                    body+'\n\n'+
+                    '>>>>>>>>>>>>>>>>>>>>>>>>> END HTTP Error <<<<<<<<<<<<<<<<<<<<<<<<<\n\n');
+            };
+            onResponse(error, response, body);
+        });
     }
 };
 

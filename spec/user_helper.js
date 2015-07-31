@@ -26,7 +26,6 @@ var createUser = function(user, url) {
             that.cookie = setCookies[0].split(';')[0] + '; ' +
                 setCookies[2].split(';')[0];
             console.log('  User "' + that.name + '" is logged in now.');
-            console.log('  Cookies are "' + that.cookie);
 
             /* Call optional on Response */
             if (onResponse) {
@@ -41,15 +40,31 @@ var createUser = function(user, url) {
 
 
 module.exports = function(url) {
+    var password = 'Hahaha! Auf dieses Passwort kommt in 100 Jahren keiner ;-)';
     return {
         getTestUser: function() {
             return createUser({
-                name: 'test',
-                password: 'test'
+                name: 'automated_testing_user',
+                email : 'automated_testing_user@capira.de',
+                password: password
+            }, url);
+        },
+        getTestAuthor: function() {
+            return createUser({
+                name: 'automated_testing_author',
+                email : 'automated_testing_author@capira.de',
+                password: password
+            }, url);
+        },
+        getTestAdmin: function() {
+            return createUser({
+                name: 'automated_testing_admin',
+                email : 'automated_testing_admin@capira.de',
+                password: password
             }, url);
         },
 
-        getRandomUser: function() {
+        createRandomUser: function() {
             var time = Date.now();
             return createUser({
                 name: 'test_' + time,
