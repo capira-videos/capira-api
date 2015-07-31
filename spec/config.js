@@ -1,10 +1,10 @@
 'use strict';
 var user = require('./user.js');
 var apiUrl = process.env.URL;
-apiUrl = apiUrl ? apiUrl : 'http://localhost:8888/api';
+apiUrl = apiUrl ? apiUrl : 'http://capira.de/build/api_v2';
 module.exports = {
     url: apiUrl,
-    user: user(apiUrl)
+    usersFactory: user(apiUrl)
 };
 
 console.log(
@@ -15,5 +15,4 @@ console.log(
 	'  **************************************\n'+
 	'  Configuration: \n'+
 	'  Server URL: '+module.exports.url+'\n'+
-	'  User: '+module.exports.user.name+'\n'+
 	'\n');
