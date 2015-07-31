@@ -17,7 +17,7 @@ gulp.task('clean', function() {
         .pipe(clean());
 });
 
-gulp.task('default', function() {
+gulp.task('default', ['copy'], function() {
     return gulp.src(['config/sftp-config.json'], {
         base: 'config'
     }).pipe(gulp.dest('dist/'));

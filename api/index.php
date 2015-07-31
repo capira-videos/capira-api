@@ -8,10 +8,9 @@
 include_once 'common.php';
 
 require 'vendor/autoload.php';
-require 'middleware.php';
 
 $app = new \Slim\Slim();
-$app->add(new \Slim\middleware\ContentTypes());
+$app->add(new \Slim\Middleware\ContentTypes());
 $app->contentType('application/json');
 
 include_once 'routes/user-api.php';
