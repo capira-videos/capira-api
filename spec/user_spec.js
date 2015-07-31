@@ -1,6 +1,5 @@
 'use strict';
 var cfg = require('./config.js');
-
 var user = cfg.usersFactory.getRandomUser();
 
 describe('A User', function() {

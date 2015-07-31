@@ -10,7 +10,11 @@ To test the API you need jasmine-node:
 `npm install jasmine-node -g`
 
 ##Run Tests
-`jasmine-node --config URL "http://<THE API SERVER URL>" test`
+Run all tests on capira.de: 
+`jasmine-node spec`
+
+Run all tests on any server:
+`jasmine-node --config URL "http://<THE API SERVER URL>" spec`
 
 ##Build Project for Deployment
 `gulp`

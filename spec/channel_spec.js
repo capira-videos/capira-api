@@ -1,11 +1,9 @@
 'use strict';
-require('jasmine-expect');
-it = require('jasmine-async-errors').wrap(it);
 var cfg = require('./config.js');
 var user = cfg.usersFactory.getTestUser();
 
 describe('A Channel', function() {
-    
+
     it('can be logged in', function(done) {
         user.login(done);
     });
@@ -18,7 +16,6 @@ describe('A Channel', function() {
                 expect(body.title).toBeString();
                 expect(body.units).toBeArray();
                 expect(body.folders).toBeArray();
-
                 done();
             });
     });

@@ -1,7 +1,6 @@
 'use strict';
 var request = require('request');
 
-
 var createUser = function(user, url) {
     user.getFields = function(fields) {
         var that = this;
@@ -21,8 +20,13 @@ var createUser = function(user, url) {
                 password: that.password
             }
         }, function(error, response, body) {
-            that.cookies = response.headers['set-cookie'];
+            var setCookies = response.headers['set-cookie'];
+
+            /* Ugly hack, because somehow the server returns 2 XSRF-Tokens.*/
+            that.cookie = setCookies[0].split(';')[0] +'; '+
+                          setCookies[2].split(';')[0];
             console.log('  User "' + that.name + '" is logged in now.');
+            console.log('  Cookies are "' + that.cookie);
             done();
         });
     };
