@@ -1,5 +1,5 @@
 'use strict';
-var frisby = require('frisby');
+var frisby = require('frisby')
 var apiUrl = process.env.URL;
 
 

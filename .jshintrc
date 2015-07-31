@@ -14,8 +14,10 @@
   "undef":     true,
   "unused":    true,
   "globals":   {
-    "require": true,
-    "process": true,
-    "expect":  true
+    "require":   true,
+    "process":   true,
+    "expect":    true,
+    "describe":  true,
+    "it":        true
   }
 }
