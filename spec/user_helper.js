@@ -9,7 +9,7 @@ var createUser = function(user, url) {
             return a;
         }, {});
     };
-    user.login = function(done) {
+    user.login = function(done, onResponse) {
         var that = this;
         request({
             method: 'POST',
@@ -23,10 +23,15 @@ var createUser = function(user, url) {
             var setCookies = response.headers['set-cookie'];
 
             /* Ugly hack, because somehow the server returns 2 XSRF-Tokens.*/
-            that.cookie = setCookies[0].split(';')[0] +'; '+
-                          setCookies[2].split(';')[0];
+            that.cookie = setCookies[0].split(';')[0] + '; ' +
+                setCookies[2].split(';')[0];
             console.log('  User "' + that.name + '" is logged in now.');
             console.log('  Cookies are "' + that.cookie);
+
+            /* Call optional on Response */
+            if (onResponse) {
+                onResponse(error, response, body);
+            }
             done();
         });
     };

@@ -9,23 +9,25 @@ apiUrl = apiUrl ? apiUrl : 'http://capira.de/build/api_v2';
 
 module.exports = {
     usersFactory: user(apiUrl),
-    request: function(method,url,body,onResponse,user){
-    	request({
+    request: function(method, url, body, onResponse, user) {
+        request({
             method: method,
             uri: apiUrl + url,
             json: true,
             body: body,
-            cookie: user?user.cookie:''
-        },onResponse);
+            headers: {
+                Cookie: user ? user.cookie : ''
+            }
+        }, onResponse);
     }
 };
 
 console.log(
-	'  **************************************\n'+
-	'  **                                  **\n'+
-	'  **     Capira API Testing Suite     **\n'+
-	'  **                                  **\n'+
-	'  **************************************\n'+
-	'  Configuration: \n'+
-	'  Server URL: '+apiUrl+'\n'+
-	'\n');
+    '  **************************************\n' +
+    '  **                                  **\n' +
+    '  **     Capira API Testing Suite     **\n' +
+    '  **                                  **\n' +
+    '  **************************************\n' +
+    '  Configuration: \n' +
+    '  Server URL: ' + apiUrl + '\n' +
+    '\n');
