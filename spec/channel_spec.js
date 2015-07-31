@@ -9,7 +9,7 @@ function equals(a, b, fields) {
     });
 }
 
-function expectationsOnChannelData(requested,response) {
+function expectationsOnChannelData(requested, response) {
     Object.keys(requested).every(function(key) {
         expect(requested[key]).toBe(requested[key]);
     });
@@ -31,27 +31,24 @@ function fullExpectationsOnChannelTypes(error, response, body, requested) {
     expect(body.folders).toBeArray();
 }
 
-function basicExpectationsOnChannel(error, response, body, requested){
+function basicExpectationsOnChannel(error, response, body, requested) {
     basicExpectationsOnChannelTypes(error, response, body);
-    expectationsOnChannelData(requested,body);
+    expectationsOnChannelData(requested, body);
 }
 
-function fullExpectationsOnChannel(error, response, body, requested){
+function fullExpectationsOnChannel(error, response, body, requested) {
     fullExpectationsOnChannelTypes(error, response, body);
-    expectationsOnChannelData(requested,body);
+    expectationsOnChannelData(requested, body);
 }
 
 
-
-
-
-function getUsernamePrint(user) {
-    return (user ? ' as ' + user.name : ' anonymously') + '...';
+function log(text, user) {
+    console.log(text + (user ? ' as ' + user.name : ' anonymously') + '...');
 }
 
 
 function fetchChannelAs(channel, user, done, onResponse) {
-    console.log('Fetch Channel', getUsernamePrint(user));
+    log('Fetch Channel', user);
     cfg.request('GET', '/channel/' + channel.id, null,
         function(error, response, body) {
             fullExpectationsOnChannel(error, response, body, channel);
@@ -63,7 +60,7 @@ function fetchChannelAs(channel, user, done, onResponse) {
 }
 
 function createChannelAs(channel, user, done, onResponse) {
-    console.log('Create Channel', getUsernamePrint(user));
+    log('Create Channel', user);
     cfg.request('POST', '/channel', channel,
         function(error, response, body) {
             onResponse(error, response, body);
@@ -74,7 +71,7 @@ function createChannelAs(channel, user, done, onResponse) {
 }
 
 function deleteChannelAs(channel, user, done, onResponse) {
-    console.log('Delete Channel', getUsernamePrint(user));
+    log('Delete Channel', user);
     cfg.request('DELETE', '/channel', channel,
         function(error, response, body) {
             onResponse(error, response, body);
@@ -86,7 +83,7 @@ function deleteChannelAs(channel, user, done, onResponse) {
 
 
 function updateChannelAs(channel, user, done, onResponse) {
-    console.log('Update Channel', getUsernamePrint(user));
+    log('Update Channel', user);
     cfg.request('PUT', '/channel', channel,
         function(error, response, body) {
             onResponse(error, response, body);
@@ -96,7 +93,16 @@ function updateChannelAs(channel, user, done, onResponse) {
         }, user);
 }
 
-
+function updateChannelParentAs(channel, user, done, onResponse) {
+    log('Update Channel Parent', user);
+    cfg.request('PUT', '/channel/parent', channel,
+        function(error, response, body) {
+            onResponse(error, response, body);
+            if (done) {
+                done();
+            }
+        }, user);
+}
 
 
 
@@ -122,10 +128,10 @@ describe('A Channel', function() {
     var updatedChannel = {};
 
     /*
-     * User Setup 
-     * The User Setup with Tests is ugly, 
-     * but beforeAll is part of Jasemine 2.1
+     * User Setup  
+     * The primitive 'beforeAll' is part of Jasemine 2.1
      * which isn't released yet: https://github.com/jasmine/jasmine/issues/704
+     * Therefore we use tests as a workaround.
      */
     it('coexists in this Tests with a authenticated User', function(done) {
         user.login(done, function(error, response) {
@@ -156,8 +162,12 @@ describe('A Channel', function() {
         });
     });
 
+
+
     /*
-     * Fetch Channel tests
+     *
+     *   Fetch Channel 
+     *
      */
     it('can be fetched anonymously', function(done) {
         fetchChannelAs(testChannel, null, done, function(error, response, body) {
@@ -191,8 +201,11 @@ describe('A Channel', function() {
 
 
 
-
-
+    /*
+     *
+     *   Create Channel 
+     *
+     */
     it('can not be created anonymously', function(done) {
         createChannelAs(testChannel.channels[0], null, done, function(error, response, body) {
             expect(response.statusCode).toBe(401);
@@ -208,7 +221,7 @@ describe('A Channel', function() {
     it('can be created by an Author', function(done) {
         createChannelAs(testChannel.channels[0], author, done, function(error, response, body) {
             basicExpectationsOnChannel(error, response, body, testChannel.channels[0]);
-            testChannel.channels[0]=body;
+            testChannel.channels[0] = body;
         });
     });
 
@@ -220,12 +233,15 @@ describe('A Channel', function() {
     });
 
 
-
-
-    it('can be changed by the client', function() {
-        updatedChannel= JSON.parse(JSON.stringify(testChannel.channels[0]));
+    /*
+     *
+     *   Update Channel 
+     *
+     */
+    it('can be updated by the client', function() {
+        updatedChannel = JSON.parse(JSON.stringify(testChannel.channels[0]));
         updatedChannel.title += '_update';
-        expect(true).toBe(true); 
+        expect(true).toBe(true);
     });
 
     it('can not be updated anonymously', function(done) {
@@ -241,6 +257,7 @@ describe('A Channel', function() {
     });
 
     it('can be updated by an Author', function(done) {
+        updatedChannel.title += '_author';
         updateChannelAs(updatedChannel, author, done, function(error, response, body) {
             basicExpectationsOnChannel(error, response, body, updatedChannel);
             expect(body.id).toBeNumber();
@@ -248,6 +265,62 @@ describe('A Channel', function() {
         });
     });
 
+    it('can be updated by an Admin', function(done) {
+        updatedChannel.title += '_admin';
+        updateChannelAs(updatedChannel, admin, done, function(error, response, body) {
+            basicExpectationsOnChannel(error, response, body, updatedChannel);
+            expect(body.id).toBeNumber();
+
+        });
+    });
+
+
+
+    /*
+     *
+     *   Update Parent of Channel 
+     *
+     */
+    it('can be updated by the client', function() {
+        updatedChannel = {
+            id: testChannel.channels[0],
+            parent: testChannel.channels[1]
+        }
+    });
+
+    it('can not be updated anonymously', function(done) {
+        updateChannelParentAs(updatedChannel, null, done, function(error, response, body) {
+            expect(response.statusCode).toBe(401);
+        });
+    });
+
+    it('can not be updated by an User', function(done) {
+        updateChannelParentAs(updatedChannel, user, done, function(error, response, body) {
+            expect(response.statusCode).toBe(401);
+        });
+    });
+
+    it('can be updated by an Author', function(done) {
+        updateChannelParentAs(updatedChannel, author, done, function(error, response, body) {
+            basicExpectationsOnChannel(error, response, body, updatedChannel);
+            expect(body.id).toBeNumber();
+
+        });
+    });
+
+    it('can be updated by an Admin', function(done) {
+        updateChannelParentAs(updatedChannel, admin, done, function(error, response, body) {
+            basicExpectationsOnChannel(error, response, body, updatedChannel);
+            expect(body.id).toBeNumber();
+
+        });
+    });
+
+    /*
+     *
+     *   Delete Channel 
+     *
+     */
     it('can not be deleted anonymously', function(done) {
         deleteChannelAs(testChannel.channels[0], null, done, function(error, response, body) {
             expect(response.statusCode).toBe(401);
