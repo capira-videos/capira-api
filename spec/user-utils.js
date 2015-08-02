@@ -1,5 +1,6 @@
 'use strict';
-var request = require('request');
+var req = require('request');
+
 
 var createUser = function(user, url) {
     user.getFields = function(fields) {
@@ -11,7 +12,7 @@ var createUser = function(user, url) {
     };
     user.login = function(done, onResponse) {
         var that = this;
-        request({
+        req({
             method: 'POST',
             uri: url + '/login',
             json: true,
@@ -53,14 +54,17 @@ module.exports = function(url) {
             return createUser({
                 name: 'automated_testing_author',
                 email : 'automated_testing_author@capira.de',
-                password: password
+                password: password,
+                author: true
             }, url);
         },
         getTestAdmin: function() {
             return createUser({
                 name: 'automated_testing_admin',
                 email : 'automated_testing_admin@capira.de',
-                password: password
+                password: password,
+                author:true,
+                admin:true
             }, url);
         },
 

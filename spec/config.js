@@ -1,18 +1,20 @@
 'use strict';
 require('jasmine-expect');
 it = require('jasmine-async-errors').wrap(it);
-var request = require('request');
-var user = require('./user_helper.js');
+var req = require('request');
+
+var user = require('./user-utils.js');
 
 var apiUrl = process.env.URL;
 var defaultUrl = 'http://localhost:8888/api';
 //var defaultUrl = 'http://capira.de/build/api_v2';
 apiUrl = apiUrl ? apiUrl : defaultUrl;
 
-module.exports = {
+
+module.exports={
     usersFactory: user(apiUrl),
     request: function(method, url, body, onResponse, user) {
-        request({
+        req({
             method: method,
             uri: apiUrl + url,
             json: true,
@@ -31,6 +33,8 @@ module.exports = {
         });
     }
 };
+
+
 
 console.log(
     '  **************************************\n' +
