@@ -20,7 +20,7 @@ $app->get('/query/users/:query', function ($query) use ($user){
  * @apiName queryForContent
  * @apiGroup Query
  * @apiPermission logged-in
- * @apiDescription Querys for Units and Folders.
+ * @apiDescription Querys for Units and Channels.
  * 
  */
 $app->get('/query/content/:query(:/page)', function ($query) use ($user,$page=0){

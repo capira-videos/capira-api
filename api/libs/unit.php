@@ -1,10 +1,10 @@
 <?php
 
 if (!defined('VALID_INCLUDE')) {
-	exit ;
+	exit;
 }
 
-function getUnit($id, $folder = false) {
+function getUnit($id, $channel = false) {
 	global $mysqli;
 	if ($id == 0) {
 		$id = 2;
@@ -34,7 +34,7 @@ function getUnit($id, $folder = false) {
 	$stmt->close();
 	$unit['layers'] = getLayers($id);
 
-	if ($folder !== false) {
+	if ($channel !== false) {
 		// fetch next unit
 		$sql = 'SELECT c.unitId
 				FROM ChannelUnits c
@@ -44,7 +44,7 @@ function getUnit($id, $folder = false) {
 				LIMIT 1';
 
 		$stmt = $mysqli->prepare($sql);
-		$stmt->bind_param('ii', $id, $folder);
+		$stmt->bind_param('ii', $id, $channel);
 		$stmt->execute();
 
 		$stmt->bind_result($next);
@@ -133,7 +133,7 @@ function getItems($id) {
 	return $items;
 }
 
-function addUnitToFolder($unitId, $folderId) {
+function addUnitToChannel($unitId, $channelId) {
 	global $mysqli;
 
 	$query = "INSERT INTO ChannelUnits(channelId,unitId) VALUES(?,?)";
@@ -143,7 +143,7 @@ function addUnitToFolder($unitId, $folderId) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ii", $folderId, $unitId)) {
+	if (!$stmt->bind_param("ii", $channelId, $unitId)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -218,11 +218,13 @@ function updateUnit($unit) {
 		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 	$stmt->close();
-	if(isset($unit['layers'])){
+	if (isset($unit['layers'])) {
 		foreach ($unit['layers'] as $layer) {
 			if (isset($layer['deleted']) && ($layer['deleted'])) {
-				if (isset($layer['id']))
+				if (isset($layer['id'])) {
 					deleteLayer($layer['id']);
+				}
+
 				continue;
 			}
 			if (isset($layer['id'])) {
@@ -231,7 +233,7 @@ function updateUnit($unit) {
 				createLayer($layer, $unit['id']);
 			}
 		}
-		}
+	}
 	return $unit;
 
 }
@@ -290,7 +292,7 @@ function deleteUnit($unit) {
 
 }
 
-function deleteUnitFromFolder($unitId, $folderId) {
+function deleteUnitFromChannel($unitId, $channelId) {
 	global $mysqli;
 
 	$query = "DELETE FROM ChannelUnits WHERE channelId=? AND unitId=?";
@@ -300,7 +302,7 @@ function deleteUnitFromFolder($unitId, $folderId) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ii", $folderId, $unitId)) {
+	if (!$stmt->bind_param("ii", $channelId, $unitId)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -406,7 +408,7 @@ function createUnit($unit) {
 			require 'permissionManagement.php';
 			$manager = new Permissions($user);
 
-			addUnitToFolder($unit['id'], $unit['parent']);
+			addUnitToChannel($unit['id'], $unit['parent']);
 		}
 
 	}
@@ -416,6 +418,5 @@ function createUnit($unit) {
 	}
 	return $unit;
 }
-
 
 ?>

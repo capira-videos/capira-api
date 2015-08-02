@@ -91,7 +91,7 @@ function getPath($channel) {
 	return $breadcrumbs;
 }
 
-function getFolder($id) {
+function getChannel($id, $sendPermissions = false) {
 
 	global $user, $mysqli;
 
@@ -113,7 +113,7 @@ function getFolder($id) {
 	$stmt->bind_param("i", $id);
 	$stmt->execute();
 
-	$folder = get_result($stmt);
+	$channel = get_result($stmt);
 	$stmt->fetch();
 	$stmt->close();
 
@@ -121,53 +121,64 @@ function getFolder($id) {
 			  FROM Channels
 			  LEFT JOIN ThumbnailCache ON ThumbnailCache.channelId=Channels.id
 			  LEFT JOIN ChannelProgress p ON p.channelId = Channels.id AND p.userId=?
-			  WHERE Channels.parent=?" . (isset($_GET['editor']) ? "" : " AND published=1") . " ORDER BY Channels.viewIndex";
+			  WHERE Channels.parent=?" . ($sendPermissions ? "" : " AND published=1") . " ORDER BY Channels.viewIndex";
 	$stmt = $mysqli->prepare($query);
 	$stmt->bind_param("ii", $userid, $id);
 	$stmt->execute();
 	$stmt->store_result();
 
-	$subfolders = array();
+	$subchannels = array();
 
-	$subfolder = get_result($stmt);
+	$subchannel = get_result($stmt);
 
 	while ($stmt->fetch()) {
-		if (isset($_GET['editor'])) {
-			$subfolder['author'] = $user->has_privilege($subfolder['id'], AUTHOR);
+		/*
+		Where is this informations necessary? Just legacy from old system? Can be large overhead...
+		if ($sendPermissions) && $user->has_privilege($subchannel['id'], AUTHOR)) {
+		$subchannel['author'] = true;
 		}
-		if ($subfolder['thumbnail'] == null) {
-			$subfolder['thumbnail'] = getThumbnailRecursiveCache($subfolder['id']);
+		 */
+		if ($subchannel['thumbnail'] == null) {
+			$subchannel['thumbnail'] = getThumbnailRecursiveCache($subchannel['id']);
 		}
 
-		$subfolders[] = $subfolder;
-		$subfolder = get_result($stmt);
+		$subchannels[] = $subchannel;
+		$subchannel = get_result($stmt);
 	}
 	$stmt->free_result();
 	$stmt->close();
 
-	$folder['folders'] = $subfolders;
-	$folder['units'] = getUnits($id);
-	$folder['path'] = getPath($id);
-	$folder['admin'] = $user->has_privilege($folder['id'], ADMIN);
-	$folder['author'] = $user->has_privilege($folder['id'], AUTHOR);
+	$channel['channels'] = $subchannels;
+	$channel['units'] = getUnits($id);
+	$channel['path'] = getPath($id);
 
-	if (isset($_GET['editor'])) {
-		$folder['parent_author'] = $user->has_privilege($folder['parent'], AUTHOR);
+	if ($sendPermissions) {
+		if ($user->has_privilege($channel['id'], ADMIN)) {
+			$channel['admin'] = true;
+		}
+		if ($user->has_privilege($channel['parent'], AUTHOR)) {
+			$channel['parentAuthor'] = true;
+		}
+	}
+	//You may want to know in the Channel if User can access the Channel-Editor.
+	//That's why we send it, even if not the full permissions have been requested.
+	if ($user->has_privilege($channel['id'], AUTHOR)) {
+		$channel['author'] = true;
 	}
 
-	return $folder;
+	return $channel;
 }
 
 // retrieves a thumbnail and caches it
-function getThumbnailRecursiveCache($folderid) {
+function getThumbnailRecursiveCache($channelid) {
 	global $mysqli;
-	$thumbnail = getThumbnailRecursive($folderid);
+	$thumbnail = getThumbnailRecursive($channelid);
 
 	// cache it
 	if ($thumbnail !== null) {
 		$sql = 'INSERT INTO ThumbnailCache (channelId, thumbnail) VALUES (?, ?)';
 		$stmt = $mysqli->prepare($sql);
-		$stmt->bind_param('is', $folderid, $thumbnail);
+		$stmt->bind_param('is', $channelid, $thumbnail);
 		$res = $stmt->execute();
 	}
 
@@ -175,9 +186,9 @@ function getThumbnailRecursiveCache($folderid) {
 }
 
 // only works for trees
-function getThumbnailRecursive($folderid) {
+function getThumbnailRecursive($channelid) {
 	global $mysqli;
-	// try fetching a thumbnail from the folder
+	// try fetching a thumbnail from the channel
 	$query = "SELECT Units.videoId as thumbnail
 				 FROM ChannelUnits
 				 JOIN Units ON (ChannelUnits.unitId=Units.id)
@@ -185,7 +196,7 @@ function getThumbnailRecursive($folderid) {
 				 LIMIT 1";
 
 	$stmt = $mysqli->prepare($query);
-	$stmt->bind_param("i", $folderid);
+	$stmt->bind_param("i", $channelid);
 	$stmt->execute();
 
 	$stmt->store_result();
@@ -201,13 +212,13 @@ function getThumbnailRecursive($folderid) {
 	if ($result) {
 		return $thumbnail;
 	} else {
-		// find subfolders and query there
+		// find subchannels and query there
 		$query = "SELECT Channels.id
 			 FROM Channels
 			 WHERE Channels.parent=?";
 
 		$stmt = $mysqli->prepare($query);
-		$stmt->bind_param("i", $folderid);
+		$stmt->bind_param("i", $channelid);
 		$stmt->execute();
 
 		$stmt->store_result();
@@ -233,9 +244,9 @@ function getThumbnailRecursive($folderid) {
 	return null;
 }
 
-function createFolder($folder) {
+function createChannel($channel) {
 
-	check_channel_privileges($folder['parent'], AUTHOR);
+	check_channel_privileges($channel['parent'], AUTHOR);
 
 	global $mysqli, $user;
 	$query = "INSERT INTO Channels(title,parent) VALUES(?,?)";
@@ -245,28 +256,28 @@ function createFolder($folder) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("si", $folder['title'], $folder['parent'])) {
+	if (!$stmt->bind_param("si", $channel['title'], $channel['parent'])) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
 	if (!$stmt->execute()) {
 		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
-	$folder['id'] = $stmt->insert_id;
+	$channel['id'] = $stmt->insert_id;
 
 	$stmt->close();
 
-	return $folder;
+	return $channel;
 }
 
-function deleteFolder($folder) {
-	//TODO: delete folders recursively
-	if (!isset($folder['parent']) && !isset($folder['id'])) {
+function deleteChannel($channel) {
+	//TODO: delete channels recursively
+	if (!isset($channel['parent']) && !isset($channel['id'])) {
 		malformed_request('missing parent or id');
 	}
 
-	check_channel_privileges($folder['parent'], AUTHOR);
-	$folderId = $folder['id'];
+	check_channel_privileges($channel['parent'], AUTHOR);
+	$channelId = $channel['id'];
 	global $mysqli;
 	$query = "DELETE FROM Channels WHERE id=?";
 
@@ -276,7 +287,7 @@ function deleteFolder($folder) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("i", $folderId)) {
+	if (!$stmt->bind_param("i", $channelId)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -287,11 +298,11 @@ function deleteFolder($folder) {
 
 }
 
-function updateFolder($folder) {
-	if (!isset($folder['id'])) {
+function updateChannel($channel) {
+	if (!isset($channel['id'])) {
 		malformed_request('Missing id');
 	}
-	check_channel_privileges($folder['id'], AUTHOR);
+	check_channel_privileges($channel['id'], AUTHOR);
 
 	global $mysqli;
 	$query = "UPDATE Channels SET title=?, published=? WHERE id=?";
@@ -301,7 +312,7 @@ function updateFolder($folder) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("sii", $folder['title'], $folder['published'], $folder['id'])) {
+	if (!$stmt->bind_param("sii", $channel['title'], $channel['published'], $channel['id'])) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -310,16 +321,16 @@ function updateFolder($folder) {
 	}
 	$stmt->close();
 
-	return $folder;
+	return $channel;
 }
 
-function updateFolderParent($folder) {
-	if (!isset($folder['parent']) && !isset($folder['id'])) {
+function updateChannelParent($channel) {
+	if (!isset($channel['parent']) && !isset($channel['id'])) {
 		malformed_request('Missing parent or id');
 	}
-	check_channel_privileges($folder['id'], AUTHOR);
+	check_channel_privileges($channel['id'], AUTHOR);
 
-	check_channel_privileges($folder['parent'], AUTHOR);
+	check_channel_privileges($channel['parent'], AUTHOR);
 
 	global $mysqli;
 	$query = "UPDATE Channels SET parent=? WHERE id=?";
@@ -329,7 +340,7 @@ function updateFolderParent($folder) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ii", $folder['parent'], $folder['id'])) {
+	if (!$stmt->bind_param("ii", $channel['parent'], $channel['id'])) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -345,7 +356,7 @@ function updateFolderParent($folder) {
 		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
 
-	$search = '%s:2:"id";i:' . intval($folder['id']) . ';%';
+	$search = '%s:2:"id";i:' . intval($channel['id']) . ';%';
 	/* Prepared statement, stage 2: bind and execute */
 	if (!$stmt->bind_param("s", $search)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
@@ -356,27 +367,27 @@ function updateFolderParent($folder) {
 	}
 	$stmt->close();
 
-	return $folder;
+	return $channel;
 }
 
 function update_unit($unit) {
 	check_unit_privileges($unit['id'], UNIT_ADMIN);
 
 	if (isset($unit['deleted']) && $unit['deleted']) {
-		echo deleteUnitFromFolder($unit['id'], $unit['folderId']);
+		echo deleteUnitFromChannel($unit['id'], $unit['channelId']);
 		return;
 	}
 	if (isset($unit['parent'])) {
-		deleteUnitFromFolder($unit['id'], $unit['folderId']);
-		addUnitToFolder($unit['id'], $unit['parent']);
+		deleteUnitFromChannel($unit['id'], $unit['channelId']);
+		addUnitToChannel($unit['id'], $unit['parent']);
 		return;
 	}
 
 	echo json_encode(updateUnit($unit));
 }
 
-function updateOrder($folder) {
-	check_channel_privileges($folder['id'], AUTHOR);
+function updateOrder($channel) {
+	check_channel_privileges($channel['id'], AUTHOR);
 
 	global $mysqli;
 
@@ -393,8 +404,8 @@ function updateOrder($folder) {
 	if (!$stmt->bind_param("ii", $i, $id)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
-	foreach ($folder['folders'] as $subfolder) {
-		$id = $subfolder['id'];
+	foreach ($channel['channels'] as $subchannel) {
+		$id = $subchannel['id'];
 		if (!$stmt->execute()) {
 			echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 		}
@@ -412,13 +423,13 @@ function updateOrder($folder) {
 
 	$i = 0;
 	$id = 0;
-	$channel = $folder['id'];
+	$channel = $channel['id'];
 
 	/* Prepared statement, stage 2: bind and execute */
 	if (!$stmt->bind_param("iii", $i, $channel, $id)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
-	foreach ($folder['units'] as $unit) {
+	foreach ($channel['units'] as $unit) {
 		$id = $unit['id'];
 		if (!$stmt->execute()) {
 			echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
@@ -428,7 +439,7 @@ function updateOrder($folder) {
 
 	$stmt->close();
 
-	return $folder;
+	return $channel;
 }
 
 ?>

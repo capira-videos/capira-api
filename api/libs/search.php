@@ -22,7 +22,7 @@ function queryString($query, $start = 0, $limit = false) {
 		$where_units[] = '(t.title LIKE ? OR u.title LIKE ?)';
 	}
 
-	$folder = array('id' => null, 'title' => null, 'parent' => null);
+	$channel = array('id' => null, 'title' => null, 'parent' => null);
 
 	$sql = 'SELECT DISTINCT u.id, u.title, u.videoId, 0 AS viewIndex, (p.correct/p.layers) AS progress
 			FROM Units u
@@ -73,7 +73,7 @@ function queryString($query, $start = 0, $limit = false) {
 	$stmt->free_result();
 	$stmt->close();
 
-	$folder['units'] = $units;
+	$channel['units'] = $units;
 
 	$a_param_type = array('i');
 	$a_bind_params = array($userid);
@@ -128,20 +128,20 @@ function queryString($query, $start = 0, $limit = false) {
 
 	$stmt->store_result();
 
-	$subfolders = array();
+	$subchannels = array();
 
-	$subfolder = get_result($stmt);
+	$subchannel = get_result($stmt);
 
 	while ($stmt->fetch()) {
-		$subfolders[] = $subfolder;
-		$subfolder = get_result($stmt);
+		$subchannels[] = $subchannel;
+		$subchannel = get_result($stmt);
 	}
 	$stmt->free_result();
 	$stmt->close();
 
-	$folder['folders'] = $subfolders;
+	$channel['channels'] = $subchannels;
 
-	return $folder;
+	return $channel;
 }
 
 ?>

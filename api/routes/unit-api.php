@@ -1,18 +1,19 @@
 <?php
 
 /**
- * @api {GET} /unit/:id 	Fetch a Unit by Id
+ * @api {GET} /unit/:id 			Fetch a Unit by Id
  * @apiName fetchUnitById
  * @apiGroup Unit
  *
- * @apiParam {Number} id 	Units unique ID.
+ * @apiParam {Number} id 			Units unique ID.
+ * @apiParam {Number} channeldId 	Id of Parent Channel.
  *
- * @apiSuccess {Unit} Unit 	Unit and its Overlays
+ * @apiSuccess {Unit} 				Unit 	Unit and its Overlays
  *
  */
-$app->get('/unit/:id(/:folder)', function ($id, $folder = 0) {
+$app->get('/unit/:id(/:channelId)', function ($id, $channelId = 0) {
 	include_once 'libs/unit.php';
-	echo json_encode(getUnit($id, $folder));
+	echo json_encode(getUnit($id, $channelId));
 });
 
 /**

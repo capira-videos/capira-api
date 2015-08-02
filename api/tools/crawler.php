@@ -4,7 +4,7 @@ if (!defined('VALID_INCLUDE')) {
 	exit;
 }
 
-function insertUnitInPlaylist($unitId, $folderId) {
+function insertUnitInPlaylist($unitId, $channelId) {
 	global $mysqli;
 
 	$query = "INSERT INTO ChannelUnits(channelId,unitId) VALUES(?,?)";
@@ -14,7 +14,7 @@ function insertUnitInPlaylist($unitId, $folderId) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ii", $folderId, $unitId)) {
+	if (!$stmt->bind_param("ii", $channelId, $unitId)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 

@@ -21,7 +21,25 @@
  */
 $app->get('/channel/:id', function ($id) {
 	include_once 'libs/channel.php';
-	echo json_encode(getFolder($id));
+	echo json_encode(getChannel($id));
+});
+
+/**
+ * @api {GET} /channel/editor/:id Fetch a Channel with current User's Permissions by Channel's Id
+ * @apiName fetchChannelWithPermissionsById
+ * @apiGroup Channel
+ * @apiVersion 1.0.0
+ *
+ * @apiParam {Number} id Channels unique ID.
+ *
+ * @apiSuccess {Channel} Channel Channel and its Sub-Channels and Units
+ *
+ * @apiPermission authenticated User
+ * @apiDescription pretty much the same API as fetchChannelById, except for additonally fields editor, author and parentAdmin
+ */
+$app->get('/channel/editor/:id', function ($id) {
+	include_once 'libs/channel.php';
+	echo json_encode(getChannel($id, true));
 });
 
 /**
@@ -60,8 +78,8 @@ $app->get('/channel/:id', function ($id) {
  */
 $app->post('/channel', function () use ($app) {
 	include_once 'libs/channel.php';
-	$folder = $app->request->getBody();
-	echo json_encode(createFolder($folder));
+	$channel = $app->request->getBody();
+	echo json_encode(createChannel($channel));
 });
 
 /**
@@ -86,8 +104,8 @@ $app->post('/channel', function () use ($app) {
  */
 $app->put('/channel', function () use ($app) {
 	include_once 'libs/channel.php';
-	$folder = $app->request->getBody();
-	echo json_encode(updateFolder($folder));
+	$channel = $app->request->getBody();
+	echo json_encode(updateChannel($channel));
 });
 
 /**
@@ -112,8 +130,8 @@ $app->put('/channel', function () use ($app) {
  */
 $app->put('/channel/parent', function () use ($app) {
 	include_once 'libs/channel.php';
-	$folder = $app->request->getBody();
-	echo json_encode(updateFolderParent($folder));
+	$channel = $app->request->getBody();
+	echo json_encode(updateChannelParent($channel));
 });
 
 /**
@@ -142,7 +160,7 @@ $app->put('/channel/parent', function () use ($app) {
 $app->delete('/channel', function () use ($app) {
 	$channel = $app->request->getBody();
 	include_once 'libs/channel.php';
-	deleteFolder($channel);
+	deleteChannel($channel);
 });
 
 $app->put('/channel/:id/sorting', function ($id) {
