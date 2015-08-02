@@ -11,7 +11,7 @@ To test the API you need jasmine-node 2.0:
 
 ##Run Tests
 Run all tests on capira.de: 
-`jasmine-node spec`
+`jasmine-node spec --verbose`
 
 Run all tests on any server:
 `jasmine-node --config URL "http://<THE API SERVER URL>" spec`
