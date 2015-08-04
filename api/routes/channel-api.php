@@ -1,8 +1,23 @@
 <?php
 
 /**
+ * @apiDefine NotPermitted
+ * @apiErrorExample {json} Error-Response:
+ *     Error 401: Unauthorized
+ *     {
+ *       "error": "You are not permitted to do this operation!"
+ *     }
  *
- * @apiDefine Unauthorized Operation
+ *
+ */
+
+/**
+ * @apiDefine MissingParameter
+ * @apiErrorExample {json} Error-Response:
+ *     Error 400: Bad Request
+ *     {
+ *       "error": "This Request was not valid!"
+ *     }
  *
  */
 
@@ -14,10 +29,10 @@
  *
  * @apiParam {Number} id Channels unique ID.
  *
- * @apiSuccess {Channel} Channel Channel and its Sub-Channels and Units
+ * @apiSuccess {Object} Channel Channel and its Sub-Channels and Units
  *
  * @apiPermission none
- * @apiSampleRequest http://192.168.178.83:8888/api/channel/
+ *
  */
 $app->get('/channel/:id', function ($id) {
 	include_once 'libs/channel.php';
@@ -32,10 +47,11 @@ $app->get('/channel/:id', function ($id) {
  *
  * @apiParam {Number} id Channels unique ID.
  *
- * @apiSuccess {Channel} Channel Channel and its Sub-Channels and Units
+ * @apiSuccess {Object} Channel Channel and its Sub-Channels and Units
  *
  * @apiPermission authenticated User
  * @apiDescription pretty much the same API as fetchChannelById, except for additonally fields editor, author and parentAdmin
+ *
  */
 $app->get('/channel/editor/:id', function ($id) {
 	include_once 'libs/channel.php';
@@ -44,7 +60,7 @@ $app->get('/channel/editor/:id', function ($id) {
 
 /**
  *
- * @api {POST} /channel/ 		Create a new channel
+ * @api {POST} /channel 		Create a new channel
  * @apiName createChannel
  * @apiGroup Channel
  * @apiVersion 1.0.0
@@ -62,18 +78,14 @@ $app->get('/channel/editor/:id', function ($id) {
  *     }
  *
  * @apiSuccessExample {json} Success-Response:
- *     HTTP/1.1 201 OK
+ *     201 OK
  *     {
  *       "title": "Capira Channel",
  *       "id": "42",
  *       "parent": "314"
  *     }
- *
- * @apiErrorExample {json} Error-Response:
- *     HTTP/1.1 401 Unauthorized
- *     {
- *       "error": "You are not permitted to do this operation!"
- *     }
+ * @apiUse NotPermitted
+ * @apiUse MissingParameter
  *
  */
 $app->post('/channel', function () use ($app) {
@@ -93,8 +105,10 @@ $app->post('/channel', function () use ($app) {
  * @apiParam {Number} parent  	Parent Id of new Channel
  *
  * @apiPermission Author of the Channel
+ * @apiUse NotPermitted
+ * @apiUse MissingParameter
  * @apiSuccessExample {json} Success-Response:
- *  HTTP/1.1 200 OK
+ *  200 OK
  *     {
  *       "title": "Capira Channel",
  *       "id": "42",
@@ -104,8 +118,7 @@ $app->post('/channel', function () use ($app) {
  */
 $app->put('/channel', function () use ($app) {
 	include_once 'libs/channel.php';
-	$channel = $app->request->getBody();
-	echo json_encode(updateChannel($channel));
+	echo json_encode(updateChannel($app->request->getBody()));
 });
 
 /**
@@ -119,6 +132,8 @@ $app->put('/channel', function () use ($app) {
  * @apiParam {Number} parent  	New Parent of the Channel
  *
  * @apiPermission Author of the Channel
+ * @apiUse NotPermitted
+ * @apiUse MissingParameter
  * @apiSuccessExample {json} Success-Response:
  *  HTTP/1.1 200 OK
  *     {
@@ -130,8 +145,7 @@ $app->put('/channel', function () use ($app) {
  */
 $app->put('/channel/parent', function () use ($app) {
 	include_once 'libs/channel.php';
-	$channel = $app->request->getBody();
-	echo json_encode(updateChannelParent($channel));
+	echo json_encode(updateChannelParent($app->request->getBody()));
 });
 
 /**
@@ -145,27 +159,59 @@ $app->put('/channel/parent', function () use ($app) {
  * @apiParamExample {json} Request-Example:
  *     {
  *       "id": "42",
- *       "parent": "314"
  *     }
  *
  * @apiPermission Author of the Parent Channel
- *
- * @apiErrorExample {json} Error-Response:
- *     HTTP/1.1 401 Unauthorized
- *     {
- *       "error": "You are not permitted to do this operation!"
- *     }
+ * @apiUse NotPermitted
+ * @apiUse MissingParameter
  *
  */
 $app->delete('/channel', function () use ($app) {
-	$channel = $app->request->getBody();
 	include_once 'libs/channel.php';
-	deleteChannel($channel);
+	deleteChannel($app->request->getBody());
 });
 
-$app->put('/channel/:id/sorting', function ($id) {
+/**
+ *
+ * @api {PUT} /channel/sorting 		Sort the Channel
+ * @apiName sortChannel
+ * @apiGroup Channel
+ * @apiVersion 1.0.0
+ * @apiDescription Sort the order of Units and Subchannels of a Channel.
+ * You put in a whole channel and the Server will iterate over all Subchannels and Units and will set their view_index to the according index in the given array.
+ *
+ *
+ * @apiPermission Author of the Channel
+ * @apiUse NotPermitted
+ * @apiUse MissingParameter
+ *
+ */
+$app->put('/channel/sorting', function () use ($app) {
 	include_once 'libs/channel.php';
-	updateOrder();
+	updateOrder($app->request->getBody());
+});
+
+/**
+ *
+ * @api {DELETE} //channel/:channelId/unit/:unitId  		Delete a Unit from Folder
+ * @apiName deleteUnitFromFolder
+ * @apiGroup Channel
+ * @apiVersion 1.0.0
+ *
+ * @apiParam {Number} id   			Id of Unit to delete
+ * @apiParamExample {json} Request-Example:
+ *     {
+ *       "id": "42",
+ *     }
+ *
+ * @apiPermission Author of the Parent Channel
+ * @apiUse NotPermitted
+ * @apiUse MissingParameter
+ *
+ */
+$app->delete('/channel/:channelId/unit/:unitId', function ($unitId, $channelId) use ($app) {
+	include_once 'libs/unit.php';
+	deleteUnitFromChannel($unitId, $channelId);
 });
 
 ?>

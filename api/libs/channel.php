@@ -7,14 +7,13 @@ if (!defined('VALID_INCLUDE')) {
 function getUnits($id, $fetchPermissions = false) {
 	global $mysqli, $user;
 
-	$query = "SELECT Units.id,Units.title,Units.videoId,Units.published,ChannelUnits.viewIndex,COALESCE(p.correct/p.layers,p.viewed) AS progress
-			  FROM ChannelUnits
+	$query = "SELECT Units.id,Units.title,Units.videoId,Units.published,ChannelUnits.viewIndex,COALESCE(p.correct/p.layers,p.viewed) AS progress, IF(Units.homechannel=?, true, false) as homeChannel FROM ChannelUnits
 			  RIGHT JOIN Units ON (ChannelUnits.unitId=Units.id)
 			  LEFT JOIN UnitProgress p ON p.unitId = Units.id AND p.userId=?
 			  WHERE ChannelUnits.channelId=?" . ($fetchPermissions ? "" : " AND published=1") . " ORDER BY ChannelUnits.viewIndex";
 	$stmt = $mysqli->prepare($query);
 	$userid = $user->userid();
-	$stmt->bind_param("ii", $userid, $id);
+	$stmt->bind_param("iii", $id, $userid, $id);
 	$stmt->execute();
 	$stmt->store_result();
 	$units = array();
@@ -22,7 +21,6 @@ function getUnits($id, $fetchPermissions = false) {
 
 	while ($stmt->fetch()) {
 		if ($fetchPermissions) {
-			/*Call From Channel-Editor*/
 			$unit['admin'] = $user->has_privilege($unit['id'], ADMIN, false);
 		}
 		$units[] = $unit;
@@ -245,8 +243,12 @@ function getThumbnailRecursive($channelid) {
 }
 
 function createChannel($channel) {
-
-	check_channel_privileges($channel['parent'], AUTHOR);
+	$parent = $channel['parent'];
+	$title = $channel['title'];
+	if (!isset($parent) || $parent == "" || !isset($title) || $title == "") {
+		malformed_request('missing parent or title');
+	}
+	check_channel_privileges($parent, AUTHOR);
 
 	global $mysqli, $user;
 	$query = "INSERT INTO Channels(title,parent) VALUES(?,?)";
@@ -256,7 +258,7 @@ function createChannel($channel) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("si", $channel['title'], $channel['parent'])) {
+	if (!$stmt->bind_param("si", $title, $parent)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -272,11 +274,11 @@ function createChannel($channel) {
 
 function deleteChannel($channel) {
 	//TODO: delete channels recursively
-	if (!isset($channel['parent']) && !isset($channel['id'])) {
+	if (!isset($channel['id'])) {
 		malformed_request('missing parent or id');
 	}
 
-	check_channel_privileges($channel['parent'], AUTHOR);
+	check_channel_privileges($channel['id'], AUTHOR);
 	$channelId = $channel['id'];
 	global $mysqli;
 	$query = "DELETE FROM Channels WHERE id=?";
@@ -325,7 +327,7 @@ function updateChannel($channel) {
 }
 
 function updateChannelParent($channel) {
-	if (!isset($channel['parent']) && !isset($channel['id'])) {
+	if (!isset($channel['parent']) || !isset($channel['id'])) {
 		malformed_request('Missing parent or id');
 	}
 	check_channel_privileges($channel['id'], AUTHOR);
@@ -370,22 +372,6 @@ function updateChannelParent($channel) {
 	return $channel;
 }
 
-function update_unit($unit) {
-	check_unit_privileges($unit['id'], UNIT_ADMIN);
-
-	if (isset($unit['deleted']) && $unit['deleted']) {
-		echo deleteUnitFromChannel($unit['id'], $unit['channelId']);
-		return;
-	}
-	if (isset($unit['parent'])) {
-		deleteUnitFromChannel($unit['id'], $unit['channelId']);
-		addUnitToChannel($unit['id'], $unit['parent']);
-		return;
-	}
-
-	echo json_encode(updateUnit($unit));
-}
-
 function updateOrder($channel) {
 	check_channel_privileges($channel['id'], AUTHOR);
 
@@ -423,10 +409,10 @@ function updateOrder($channel) {
 
 	$i = 0;
 	$id = 0;
-	$channel = $channel['id'];
+	$channelId = $channel['id'];
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("iii", $i, $channel, $id)) {
+	if (!$stmt->bind_param("iii", $i, $channelId, $id)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 	foreach ($channel['units'] as $unit) {
