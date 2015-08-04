@@ -16,6 +16,7 @@ $app->contentType('application/json');
 include_once 'routes/user-api.php';
 include_once 'routes/channel-api.php';
 include_once 'routes/unit-api.php';
+include_once 'routes/permissions-api.php';
 
 $app->run();
 
