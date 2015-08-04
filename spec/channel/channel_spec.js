@@ -64,21 +64,15 @@ describe('Channel', function() {
      *
      */
     it('can be fetched anonymously', function(done) {
-        utils.fetchChannelAs(testDataChannel, null, done, function(error, response, body) {
-
-        });
+        utils.fetchChannelAs(testDataChannel, null, done);
     });
 
     it('can be fetched as User', function(done) {
-        utils.fetchChannelAs(testDataChannel, user, done, function(error, response, body) {
-
-        });
+        utils.fetchChannelAs(testDataChannel, user, done);
     });
 
     it('can be fetched as Author', function(done) {
-        utils.fetchChannelAs(testDataChannel, author, done, function(error, response, body) {
-
-        });
+        utils.fetchChannelAs(testDataChannel, author, done);
     });
 
     it('can be fetched as Admin', function(done) {
@@ -319,6 +313,9 @@ describe('Channel', function() {
     });
 
 
+
+    //TODO: test sorting
+    //TODO: test rekursive delete
 
 
 });
