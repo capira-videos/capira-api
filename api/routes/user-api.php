@@ -67,13 +67,14 @@ $app->post('/signup', function () use ($user) {
  * @apiParam {String} name 		Username of the User
  * @apiParam {String} password 	Password of the User
  *
- * @apiSuccess {User} User The User
+ * @apiSuccess {Object} User The User
  * @apiPermission 	  none
  *
  */
 $app->post('/login', function () use ($app, $user) {
-	$request = $app->request->getBody();
-	echo $user->login($request['name'], $request['password']);
+	$channel = $app->request->getBody();
+	echo $user->login($channel['name'], $channel['password']);
+	//TODO: unset password ?
 });
 
 /**
@@ -103,9 +104,16 @@ $app->get('/me', function () use ($user) {
 	echo $user->json_object();
 });
 
-/*
-
--       Not that important
------   Very important
-
+/**
+ *
+ * @api {GET} /users/:query 	Query for Users by name and email
+ * @apiName queryForUsers
+ * @apiGroup User
+ * @apiVersion 1.0.0
+ * @apiPermission Authenticated User
+ *
  */
+$app->get('/users/:query', function ($query) {
+	include_once 'libs/users.php';
+	echo json_encode(queryForUsers($query));
+});

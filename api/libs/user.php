@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('VALID_INCLUDE')) {
-	exit ;
+	exit;
 }
 
 class User {
@@ -56,7 +56,7 @@ class User {
 			if ($_SESSION['id'] == $id) {
 				$this->_userid = $_SESSION['id'];
 				$this->_logged_in = ($name != null && !empty($name));
-                $this->_username=$name;
+				$this->_username = $name;
 				if (!$this->_logged_in) {
 					$sql = 'UPDATE `Users` SET `last_login`=CURRENT_TIMESTAMP WHERE id=?';
 					$stmt = $mysqli->prepare($sql);
@@ -86,10 +86,14 @@ class User {
 	 */
 	private function set_session_token($anonymous = false) {
 		// set a cookie that contains the token
-		if ($anonymous)
-			setcookie('XSRF-TOKEN', $_SESSION['session_token'], time() + 3600*24*30, '/');  //expire in 30 days
-		else
-			setcookie('XSRF-TOKEN', $_SESSION['session_token'], time() + 3600*24*3, '/'); //expire in 3 days
+		if ($anonymous) {
+			setcookie('XSRF-TOKEN', $_SESSION['session_token'], time() + 3600 * 24 * 30, '/');
+		}
+		//expire in 30 days
+		else {
+			setcookie('XSRF-TOKEN', $_SESSION['session_token'], time() + 3600 * 24 * 3, '/');
+		}
+		//expire in 3 days
 	}
 
 	// Returns if the user is logged in.
@@ -103,16 +107,14 @@ class User {
 	}
 
 	//Returns the username
-	public function name(){
-        return $this->_username;
-     }
+	public function name() {
+		return $this->_username;
+	}
 
 	// Returns if User is Anonymous.
-    public function isAnonymous() {
-    	return !(isset($this->_username) && $this->_username!=null && $this->_username!="");
-    }
-
-
+	public function isAnonymous() {
+		return !(isset($this->_username) && $this->_username != null && $this->_username != "");
+	}
 
 	public function json_object() {
 		global $mysqli;
@@ -144,12 +146,14 @@ class User {
 		return json_encode($user);
 	}
 
-
-
 	/**
 	 * This function logs a user in.
 	 */
 	public function login($name, $password) {
+
+		if (!isset($name) || $name == "" || !isset($password) || $password == "") {
+			malformed_request('missing <code>name</code> or <code>password</code>');
+		}
 		global $mysqli;
 		$sql = 'SELECT password, id FROM UserData WHERE name=?';
 		$stmt = $mysqli->prepare($sql);
@@ -215,8 +219,9 @@ class User {
 		session_destroy();
 
 		// only if really logged in
-		if (!$logged_in)
+		if (!$logged_in) {
 			return LOGGED_OUT;
+		}
 
 		$sql = 'UPDATE Users SET session_token=? WHERE id=?';
 		$stmt = $mysqli->prepare($sql);
@@ -265,7 +270,7 @@ class User {
 			$insertId = $mysqli->insert_id;
 		} else {
 			$insertId = $this->_userid;
-			$res=true;
+			$res = true;
 		}
 
 		if ($res) {
@@ -311,17 +316,19 @@ class User {
 
 	public function has_privilege($id, $privilege, $is_channel = true) {
 		global $mysqli;
-		if (!$this->_logged_in)
+		if (!$this->_logged_in) {
 			return $privilege == ANONYMOUS;
-		if($privilege == ANONYMOUS)
+		}
+
+		if ($privilege == ANONYMOUS) {
 			return true;
+		}
 
 		$userid = $this->_userid;
 
 		// see if user is godmode or owner
 		$sql = 'SELECT COALESCE(us.godmode,0), c.owner FROM UserData us, ' . ($is_channel ? 'Channels' : 'Units') . ' c WHERE c.id = ? AND us.id = ?';
 		$stmt = $mysqli->prepare($sql);
-
 
 		$stmt->bind_param('ii', $id, $userid);
 		$stmt->execute();
@@ -335,15 +342,14 @@ class User {
 		$stmt->close();
 
 		// done!
-		if($godmode == 1 || $owner == $this->_userid) {
+		if ($godmode == 1 || $owner == $this->_userid) {
 			return true;
 		}
 
 		// if is unit, first try at unit level before switching to channel permissions
-		if(!$is_channel) {
+		if (!$is_channel) {
 			$sql = 'SELECT level FROM UnitAccess WHERE unitid = ? AND userid = ?';
 			$stmt = $mysqli->prepare($sql);
-
 
 			$stmt->bind_param('ii', $id, $userid);
 			$stmt->execute();
@@ -358,10 +364,9 @@ class User {
 			$stmt->close();
 
 			// admin or privilege
-			if($found) {
+			if ($found) {
 				return $level >= $privilege;
 			}
-
 
 			// ok, now switch over to channels
 			// first find out homechannel
@@ -390,8 +395,7 @@ class User {
 		$sql = 'SELECT GetNextLevel(?, ?) AS level';
 		$stmt = $mysqli->prepare($sql);
 
-
-		$stmt->bind_param('ii', $userid,$id);
+		$stmt->bind_param('ii', $userid, $id);
 
 		$stmt->execute();
 		$stmt->store_result();
