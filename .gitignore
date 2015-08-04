@@ -5,3 +5,4 @@ api/vendor
 npm-debug.log
 reports
 test/reports
+config
