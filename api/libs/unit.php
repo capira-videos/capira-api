@@ -14,19 +14,11 @@ function getUnit($id, $channel = false) {
 			LEFT JOIN (UnitTags,Tags) ON (UnitTags.tagId=Tags.id AND UnitTags.unitId=?)
 			LEFT JOIN DownloadLinks ON DownloadLinks.unitId=?
 			WHERE Units.id=?";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("iii", $id, $id, $id)) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("iii", $id, $id, $id);
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 
 	$unit = get_result($stmt);
 	$stmt->fetch();
@@ -109,18 +101,10 @@ function getItems($id) {
 	global $mysqli;
 	$query = "SELECT * FROM Items WHERE parent=?";
 
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("i", $id);
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("i", $id)) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
-
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 
 	$items = array();
 	$item = get_result($stmt);
@@ -137,38 +121,22 @@ function addUnitToChannel($unitId, $channelId) {
 	global $mysqli;
 
 	$query = "INSERT INTO ChannelUnits(channelId,unitId) VALUES(?,?)";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ii", $channelId, $unitId)) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("ii", $channelId, $unitId);
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 	$stmt->close();
 }
 
 function createLayer($layer, $parent) {
 	global $mysqli;
 	$query = "INSERT INTO Layers(parent,duration,start,type,interaction,classes,layerCSS) VALUES(?,?,?,?,?,?,?) ";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("iddssss", $parent, $layer['duration'], $layer['start'], $layer['type'], $layer['interaction'], $layer['classes'], $layer['layerCSS'])) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("iddssss", $parent, $layer['duration'], $layer['start'], $layer['type'], $layer['interaction'], $layer['classes'], $layer['layerCSS']);
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 	$layer['id'] = $stmt->insert_id;
 	$stmt->close();
 	foreach ($layer['items'] as $item) {
@@ -182,19 +150,11 @@ function createLayer($layer, $parent) {
 function createItem($item, $parent) {
 	global $mysqli;
 	$query = " INSERT INTO Items(parent,x,y,height,width,caption,expectedValue,feedback,type,classes) VALUES(?,?,?,?,?,?,?,?,?,?) ";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("iddddsssss", $parent, $item['x'], $item['y'], $item['height'], $item['width'], $item['caption'], $item['expectedValue'], $item['feedback'], $item['type'], $item['classes'])) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("iddddsssss", $parent, $item['x'], $item['y'], $item['height'], $item['width'], $item['caption'], $item['expectedValue'], $item['feedback'], $item['type'], $item['classes']);
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 	$stmt->close();
 }
 
@@ -204,19 +164,11 @@ function updateUnit($unit) {
 	check_unit_privileges($unit['id'], AUTHOR);
 
 	$query = "UPDATE Units SET title=?, videoId=?, published=? WHERE id=?";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ssii", $unit['title'], $unit['videoId'], $unit['published'], $unit['id'])) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("ssii", $unit['title'], $unit['videoId'], $unit['published'], $unit['id']);
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 	$stmt->close();
 	if (isset($unit['layers'])) {
 		foreach ($unit['layers'] as $layer) {
@@ -224,7 +176,6 @@ function updateUnit($unit) {
 				if (isset($layer['id'])) {
 					deleteLayer($layer['id']);
 				}
-
 				continue;
 			}
 			if (isset($layer['id'])) {
@@ -241,19 +192,11 @@ function updateUnit($unit) {
 function updateLayer($layer) {
 	global $mysqli;
 	$query = "UPDATE Layers SET duration=?, start=?, type=?, interaction=?, classes=?, layerCSS=? WHERE id=?";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ddssssi", $layer['duration'], $layer['start'], $layer['type'], $layer['interaction'], $layer['classes'], $layer['layerCSS'], $layer['id'])) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("ddssssi", $layer['duration'], $layer['start'], $layer['type'], $layer['interaction'], $layer['classes'], $layer['layerCSS'], $layer['id']);
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 	$stmt->close();
 
 	foreach ($layer['items'] as $item) {
@@ -272,97 +215,59 @@ function updateLayer($layer) {
 function updateItem($item) {
 	global $mysqli;
 	$query = "UPDATE Items SET x=?, y=?, height=?, width=?, caption=?, expectedValue=?, feedback=?, type=?, classes=? WHERE id=?";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
-
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ddddsssssi", $item['x'], $item['y'], $item['height'], $item['width'], $item['caption'], $item['expectedValue'], $item['feedback'], $item['type'], $item['classes'], $item['id'])) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
-
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("ddddsssssi", $item['x'], $item['y'], $item['height'], $item['width'], $item['caption'], $item['expectedValue'], $item['feedback'], $item['type'], $item['classes'], $item['id']);
+	$stmt->execute();
 	$stmt->close();
 }
 
-function deleteUnit($unit) {
+function deleteUnit($unitId) {
+	check_unit_privileges($unitId, AUTHOR);
 
+	global $mysqli;
+	$query = "DELETE FROM Units WHERE id=?";
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("i", $unitId);
+	$stmt->execute();
+	$stmt->close();
 }
 
 function deleteUnitFromChannel($unitId, $channelId) {
+	check_channel_privileges($channelId, AUTHOR);
+
 	global $mysqli;
 
 	$query = "DELETE FROM ChannelUnits WHERE channelId=? AND unitId=?";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("ii", $channelId, $unitId)) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("ii", $channelId, $unitId);
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 	$stmt->close();
 }
 
 function deleteLayer($layerId) {
 	global $mysqli;
 	$query = "DELETE FROM Layers WHERE id=?";
-
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
-
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("i", $layerId)) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
-
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("i", $layerId);
+	$stmt->execute();
 	$stmt->close();
+
 	$query = "DELETE FROM Items WHERE parent=?";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
-
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("i", $layerId)) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
-
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("i", $layerId);
+	$stmt->execute();
 	$stmt->close();
 }
 
 function deleteItem($item) {
 	global $mysqli;
 	$query = " DELETE FROM Items WHERE id=?";
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
 
-	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("i", $item['id'])) {
-		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
-
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param("i", $item['id']);
+	$stmt->execute();
 	$stmt->close();
 }
 
@@ -377,29 +282,18 @@ function createUnit($unit) {
 		$query = "INSERT INTO Units(title,videoId,authorId) VALUES(?,?,?) ";
 	}
 
-	/* Prepared statement, stage 1: prepare */
-	if (!($stmt = $mysqli->prepare($query))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-	}
+	$stmt = $mysqli->prepare($query);
 
 	if (!isset($unit['authorId'])) {
 		$unit['authorId'] = 0;
 	}
-
-	/* Prepared statement, stage 2: bind and execute */
 	if (isset($unit['parent'])) {
-		if (!$stmt->bind_param("sssi", $unit['title'], $unit['videoId'], $unit['authorId'], $parent)) {
-			echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-		}
+		$stmt->bind_param("sssi", $unit['title'], $unit['videoId'], $unit['authorId'], $parent);
 	} else {
-		if (!$stmt->bind_param("sss", $unit['title'], $unit['videoId'], $unit['authorId'])) {
-			echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
-		}
+		$stmt->bind_param("sss", $unit['title'], $unit['videoId'], $unit['authorId']);
 	}
 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-	}
+	$stmt->execute();
 	$unit['id'] = $stmt->insert_id;
 	$stmt->close();
 
@@ -417,6 +311,18 @@ function createUnit($unit) {
 		return updateUnit($unit);
 	}
 	return $unit;
+}
+
+function updateUnitParent($unit) {
+	if (!isset($unit['parent']) || !isset($unit['id']) || !isset($unit['oldParent'])) {
+		malformed_request('Missing parent, oldParent or id');
+	}
+
+	check_channel_privileges($unit['parent'], AUTHOR);
+	check_channel_privileges($unit['oldParent'], AUTHOR);
+
+	deleteUnitFromChannel($unit['id'], $unit['oldParent']);
+	addUnitToChannel($unit['id'], $unit['parent']);
 }
 
 ?>
