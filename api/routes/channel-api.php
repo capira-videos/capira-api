@@ -193,8 +193,8 @@ $app->put('/channel/sorting', function () use ($app) {
 
 /**
  *
- * @api {DELETE} //channel/:channelId/unit/:unitId  		Delete a Unit from Folder
- * @apiName deleteUnitFromFolder
+ * @api {DELETE} /channel/:channelId/unit/:unitId  		Delete a Unit from Channel
+ * @apiName deleteUnitFromChannel
  * @apiGroup Channel
  * @apiVersion 1.0.0
  *
@@ -209,7 +209,7 @@ $app->put('/channel/sorting', function () use ($app) {
  * @apiUse MissingParameter
  *
  */
-$app->delete('/channel/:channelId/unit/:unitId', function ($unitId, $channelId) use ($app) {
+$app->delete('/channel/:channelId/unit/:unitId', function ($channelId, $unitId) {
 	include_once 'libs/unit.php';
 	deleteUnitFromChannel($unitId, $channelId);
 });
