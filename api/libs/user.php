@@ -315,6 +315,7 @@ class User {
 	}
 
 	public function has_privilege($id, $privilege, $is_channel = true) {
+		//TODO: Server crashes when channelId doesn't exist!!
 		global $mysqli;
 		if (!$this->_logged_in) {
 			return $privilege == ANONYMOUS;
