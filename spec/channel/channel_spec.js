@@ -314,8 +314,9 @@ describe('Channel', function() {
 
 
 
-    //TODO: test sorting
-    //TODO: test rekursive delete
-
+//TODO: test sorting
+//TODO: test rekursive delete
+//TODO: test home channel of units 
+//          -type is bool
 
 });
