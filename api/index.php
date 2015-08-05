@@ -5,6 +5,7 @@
  * before you instantiate the Slim application.
  * ( http://docs.slimframework.com/sessions/native/ )
  */
+
 include_once 'common.php';
 
 require 'vendor/autoload.php';
@@ -17,7 +18,10 @@ include_once 'routes/user-api.php';
 include_once 'routes/channel-api.php';
 include_once 'routes/unit-api.php';
 include_once 'routes/permissions-api.php';
+//TODO: Add Comments-API
 
 $app->run();
+
+//TODO: Remove redirects from Server - direct links are 1.4s faster then the redirected
 
 ?>
