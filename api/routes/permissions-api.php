@@ -68,3 +68,5 @@ $app->delete('/permissions/unit/:unitId/author/:userId', function ($unitId, $use
 	$manager = new Permissions($user);
 	echo json_encode($manager->remove_unit_permissions($unitId, $userId));
 });
+
+?>

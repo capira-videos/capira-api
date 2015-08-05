@@ -236,14 +236,12 @@ function deleteUnitFromChannel($unitId, $channelId) {
 	check_channel_privileges($channelId, AUTHOR);
 
 	global $mysqli;
-
 	$query = "DELETE FROM ChannelUnits WHERE channelId=? AND unitId=?";
-
 	$stmt = $mysqli->prepare($query);
 	$stmt->bind_param("ii", $channelId, $unitId);
-
 	$stmt->execute();
 	$stmt->close();
+
 }
 
 function deleteLayer($layerId) {
@@ -263,7 +261,7 @@ function deleteLayer($layerId) {
 
 function deleteItem($item) {
 	global $mysqli;
-	$query = " DELETE FROM Items WHERE id=?";
+	$query = "DELETE FROM Items WHERE id=?";
 
 	$stmt = $mysqli->prepare($query);
 	$stmt->bind_param("i", $item['id']);

@@ -82,3 +82,4 @@ $app->delete('/unit/:id', function ($id) use ($app) {
 	include_once 'libs/unit.php';
 	deleteUnit($id);
 });
+?>
