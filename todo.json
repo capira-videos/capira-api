@@ -1,0 +1,50 @@
+[
+  {
+    "file": "channel/channel_spec.js",
+    "kind": "TODO",
+    "line": 317,
+    "text": "test sorting"
+  },
+  {
+    "file": "channel/channel_spec.js",
+    "kind": "TODO",
+    "line": 318,
+    "text": "test rekursive delete"
+  },
+  {
+    "file": "channel/channel_spec.js",
+    "kind": "TODO",
+    "line": 319,
+    "text": "test home channel of units"
+  },
+  {
+    "file": "index.php",
+    "kind": "TODO",
+    "line": 21,
+    "text": "Add Comments-API"
+  },
+  {
+    "file": "index.php",
+    "kind": "TODO",
+    "line": 25,
+    "text": "Remove redirects from Server - direct links are 1.4s faster then the redirected"
+  },
+  {
+    "file": "libs/channel.php",
+    "kind": "TODO",
+    "line": 277,
+    "text": "delete channels recursively"
+  },
+  {
+    "file": "libs/user.php",
+    "kind": "TODO",
+    "line": 318,
+    "text": "Server crashes when channelId doesn't exist!!"
+  },
+  {
+    "file": "routes/user-api.php",
+    "kind": "TODO",
+    "line": 77,
+    "text": "unset password ?"
+  }
+]
