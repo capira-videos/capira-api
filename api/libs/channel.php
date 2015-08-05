@@ -7,7 +7,7 @@ if (!defined('VALID_INCLUDE')) {
 function getUnits($id, $fetchPermissions = false) {
 	global $mysqli, $user;
 
-	$query = "SELECT Units.id,Units.title,Units.videoId,Units.published,ChannelUnits.viewIndex,COALESCE(p.correct/p.layers,p.viewed) AS progress, IF(Units.homechannel=?, true, false) as homeChannel FROM ChannelUnits
+	$query = "SELECT Units.id,Units.title,Units.videoId,Units.published,ChannelUnits.viewIndex,COALESCE(p.correct/p.layers,p.viewed) AS progress, IF(Units.homechannel=?, TRUE, FALSE) as isHomeChannel FROM ChannelUnits
 			  RIGHT JOIN Units ON (ChannelUnits.unitId=Units.id)
 			  LEFT JOIN UnitProgress p ON p.unitId = Units.id AND p.userId=?
 			  WHERE ChannelUnits.channelId=?" . ($fetchPermissions ? "" : " AND published=1") . " ORDER BY ChannelUnits.viewIndex";
@@ -23,6 +23,7 @@ function getUnits($id, $fetchPermissions = false) {
 		if ($fetchPermissions) {
 			$unit['admin'] = $user->has_privilege($unit['id'], ADMIN, false);
 		}
+		$unit['isHomeChannel'] = (bool) $unit['isHomeChannel'];
 		$units[] = $unit;
 		$unit = get_result($stmt);
 	}
