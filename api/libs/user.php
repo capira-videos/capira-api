@@ -315,7 +315,6 @@ class User {
 	}
 
 	public function has_privilege($id, $privilege, $is_channel = true) {
-		//TODO: Server crashes when channelId doesn't exist!!
 		global $mysqli;
 		if (!$this->_logged_in) {
 			return $privilege == ANONYMOUS;
@@ -393,6 +392,9 @@ class User {
 		// 		JOIN ' . ($is_channel ? 'Channels' : 'Units') . ' c ON c.id = p.' . ($is_channel ? 'channel' : 'unit') . 'id
 
 		// 		WHERE p.' . ($is_channel ? 'channel' : 'unit') . 'id=? AND u.userid=?';
+
+		//TODO: Server crashes when channelId doesn't exist!! Probably in SQL-Function GetNextLevel
+
 		$sql = 'SELECT GetNextLevel(?, ?) AS level';
 		$stmt = $mysqli->prepare($sql);
 

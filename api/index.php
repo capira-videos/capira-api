@@ -14,11 +14,12 @@ $app = new \Slim\Slim();
 $app->add(new \Slim\Middleware\ContentTypes());
 $app->contentType('application/json');
 
-include_once 'routes/user-api.php';
-include_once 'routes/channel-api.php';
-include_once 'routes/unit-api.php';
-include_once 'routes/permissions-api.php';
-//TODO: Add Comments-API
+include 'routes/user-api.php';
+include 'routes/channel-api.php';
+include 'routes/unit-api.php';
+include 'routes/permissions-api.php';
+//TODO: Implement Comments-API
+//TODO: Implement Progress-API
 
 $app->run();
 
