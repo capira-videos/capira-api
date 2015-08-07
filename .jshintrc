@@ -19,6 +19,6 @@
     "expect":    true,
     "describe":  true,
     "it":        true,
-    "beforeAll"  true
+    "beforeAll":  true
   }
 }
