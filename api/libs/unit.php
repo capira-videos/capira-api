@@ -74,18 +74,19 @@ function updateUnit($unit) {
 	global $mysqli;
 
 	check_unit_privileges($unit['id'], AUTHOR);
+	unset($unit['admin']);
 
 	$query = "UPDATE Units SET title=?, videoId=?, published=?, unitblob=? WHERE id=?";
 
 	$stmt = $mysqli->prepare($query);
 
 	// delete and create
-	if (isset($unit['layers'])) {
-		$layers = array();
+	if (isset($unit['overlays'])) {
+		$overlays = array();
 		$maxLayerId = 0;
 		$maxItemId = 0;
 		// determine max id's
-		foreach ($unit['layers'] as $layer) {
+		foreach ($unit['overlays'] as $layer) {
 			if(isset($layer['id'])) {
 				$maxLayerId = max($maxLayerId, $layer['id']);
 				foreach ($layer['items'] as $item) {
@@ -97,7 +98,7 @@ function updateUnit($unit) {
 		}
 
 		// then delete and set ids
-		foreach ($unit['layers'] as $layer) {
+		foreach ($unit['overlays'] as $layer) {
 			if (isset($layer['deleted']) && ($layer['deleted'])) {
 				continue;
 			}
@@ -150,6 +151,7 @@ function deleteUnitFromChannel($unitId, $channelId) {
 function createUnit($unit) {
 	global $mysqli, $user;
 
+	unset($unit['admin']);
 	if (isset($unit['parent'])) {
 		$parent = $unit['parent'];
 		check_channel_privileges($parent, AUTHOR);

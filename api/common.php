@@ -9,7 +9,7 @@ ini_set("display_errors", 1);
 
 define('VALID_INCLUDE', true);
 
-$mysqli = new mysqli('sql247.your-server.de', 'capira_6_w', 'WBX1V18QCUWZk2DJ', 'capira_db6');
+$mysqli = new mysqli('sql247.your-server.de', 'capira_2_w', 'nGtDHq4DRWvqv5fu', 'capira_db2');
 if ($mysqli->connect_errno) {
     echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 }
