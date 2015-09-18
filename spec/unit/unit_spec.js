@@ -1,8 +1,8 @@
 'use strict';
-var utils = require('./channel-utils.js');
+var utils = require('./unit-utils.js');
 
 
-describe('Channel', function() {
+describe('Unit', function() {
     var user = utils.usersFactory.getTestUser();
     var author = utils.usersFactory.getTestAuthor();
     var admin = utils.usersFactory.getTestAdmin();
