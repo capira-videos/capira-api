@@ -6,8 +6,8 @@ var req = require('request');
 var user = require('./user-utils.js');
 
 var apiUrl = process.env.URL;
-//var defaultUrl = 'http://localhost:8888/api';
-var defaultUrl = 'http://capira.de/build/socrates/api';
+var defaultUrl = 'http://localhost:8888/api';
+//var defaultUrl = 'http://capira.de/build/socrates/api';
 apiUrl = apiUrl ? apiUrl : defaultUrl;
 
 
