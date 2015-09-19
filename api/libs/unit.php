@@ -122,6 +122,9 @@ function updateUnit($unit) {
 	if (!isset($unit['videoId'])) {
 		$unit['videoId'] = "";
 	}
+	if (!isset($unit['title'])) {
+		$unit['title'] = "";
+	}
 
 	$blob = serialize($unit);
 	$stmt->bind_param("ssisi", $unit['title'], $unit['videoId'], $unit['published'], $blob, $unit['id']);
@@ -175,11 +178,14 @@ function createUnit($unit) {
 	if (!isset($unit['videoId'])) {
 		$unit['videoId'] = "";
 	}
+	if (!isset($unit['title'])) {
+		$unit['title'] = "";
+	}
 	$blob = serialize($unit);
 	if (isset($unit['parent'])) {
 		$stmt->bind_param("sssis", $unit['title'], $unit['videoId'], $unit['authorId'], $parent, $blob);
 	} else {
-		$stmt->bind_param("ssss", $unit['title'], $unit['videoId'], $unit['authorId'], $blob);
+		$test = $stmt->bind_param("ssss", $unit['title'], $unit['videoId'], $unit['authorId'], $blob);
 	}
 
 	$stmt->execute();
