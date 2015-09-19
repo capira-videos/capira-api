@@ -24,6 +24,9 @@ function getUnit($id, $channel = false) {
 	$stmt->fetch();
 
 	$unit = unserialize($data['unitblob']);
+	if(!isset($unit['id'])) {
+		$unit['id'] = $id;
+	}
 
 	$stmt->close();
 
