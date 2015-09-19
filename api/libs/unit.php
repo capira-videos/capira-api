@@ -116,6 +116,13 @@ function updateUnit($unit) {
 		}
 	}
 
+	if (!isset($unit['authorId'])) {
+		$unit['authorId'] = 0;
+	}
+	if (!isset($unit['videoId'])) {
+		$unit['videoId'] = "";
+	}
+
 	$blob = serialize($unit);
 	$stmt->bind_param("ssisi", $unit['title'], $unit['videoId'], $unit['published'], $blob, $unit['id']);
 
@@ -164,6 +171,9 @@ function createUnit($unit) {
 
 	if (!isset($unit['authorId'])) {
 		$unit['authorId'] = 0;
+	}
+	if (!isset($unit['videoId'])) {
+		$unit['videoId'] = "";
 	}
 	$blob = serialize($unit);
 	if (isset($unit['parent'])) {
