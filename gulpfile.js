@@ -12,22 +12,24 @@ gulp.task('doc', function() {
 });
 
 gulp.task('clean', function() {
-    return gulp.src(['dist/', '!**/*/sftp-config.json'], {
+    return gulp.src(['../dist/api/', '!**/*/sftp-config.json'], {
             read: false
         })
-        .pipe(clean());
+        .pipe(clean({
+            force: true
+        }));
 });
 
 gulp.task('default', ['copy'], function() {
     return gulp.src(['config/sftp-config.json'], {
         base: 'config'
-    }).pipe(gulp.dest('dist/'));
+    }).pipe(gulp.dest('../dist/api/'));
 });
 
 gulp.task('copy', ['clean'], function() {
     return gulp.src(['api/**/*.php', '!api/vendor/slim/slim/tests/**/*', 'api/**/.htaccess', '!api/tools/**/*'], {
         base: 'api'
-    }).pipe(gulp.dest('dist'));
+    }).pipe(gulp.dest('../dist/api'));
 });
 
 
