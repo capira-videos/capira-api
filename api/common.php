@@ -1,5 +1,7 @@
 <?php 
 
+session_name('capira_v3');
+
 session_set_cookie_params(3600*24*30,'/');
 // important
 session_start();
