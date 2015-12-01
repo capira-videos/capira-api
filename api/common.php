@@ -1,8 +1,6 @@
-<?php 
+<?php
 
-session_name('capira_v3');
-
-session_set_cookie_params(3600*24*30,'/');
+session_set_cookie_params(3600 * 24 * 30, '/');
 // important
 session_start();
 
@@ -11,25 +9,22 @@ ini_set("display_errors", 1);
 
 define('VALID_INCLUDE', true);
 
-$mysqli = new mysqli('sql379.your-server.de', 'capira_2_w', 'nGtDHq4DRWvqv5fu', 'capira_db2');
+$mysqli = new mysqli('sql379.your-server.de', 'capira_2_w', 's9Bn3Jg62bM1B6V8', 'capira_db2');
 if ($mysqli->connect_errno) {
-    echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+	echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 }
 
 if (!$mysqli->set_charset("utf8")) {
-    printf("Error loading character set utf8: %s\n", $mysqli->error);
+	printf("Error loading character set utf8: %s\n", $mysqli->error);
 }
 
-require('libs/constants.php');
-require('libs/database.php');
-require('libs/misc.php');
-require('libs/password.php');
-require('libs/user.php');
+require 'libs/constants.php';
+require 'libs/database.php';
+require 'libs/misc.php';
+require 'libs/password.php';
+require 'libs/user.php';
 
 $user = new User();
-
-
-
 
 //delete anonymous _inactive_ users from today
 $query = "DELETE FROM Users USING Users
@@ -41,11 +36,9 @@ LEFT JOIN UnitProgress
         	AND ISNULL(UnitProgress.userId)
         	AND DATE_SUB(CURRENT_TIMESTAMP,INTERVAL 60*60 SECOND) >= last_login";
 
-
-
 /* Prepared statement, stage 1: prepare */
 if (!($mysqli->query($query))) {
-    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 
 }
 
@@ -54,7 +47,7 @@ $query = "DELETE FROM Users USING Users LEFT JOIN UserData ON UserData.id=Users.
 
 /* Prepared statement, stage 1: prepare */
 if (!($mysqli->query($query))) {
-    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 }
 
 ?>
