@@ -24,7 +24,7 @@ function getUnit($id, $channel = false) {
 	$stmt->fetch();
 
 	$unit = unserialize($data['unitblob']);
-	if(!isset($unit['id'])) {
+	if (!isset($unit['id'])) {
 		$unit['id'] = $id;
 	}
 
@@ -74,68 +74,92 @@ function addUnitToChannel($unitId, $channelId) {
 }
 
 function updateUnit($unit) {
+
+	if (!isset($unit['overlays'])) {
+		return updateUnitTitle($unit);
+	}
 	global $mysqli;
 
 	check_unit_privileges($unit['id'], AUTHOR);
 	unset($unit['admin']);
 
-	$query = "UPDATE Units SET title=?, videoId=?, published=?, unitblob=? WHERE id=?";
+	$query = "UPDATE Units SET title=?, videoId=?, unitblob=? WHERE id=?";
 
 	$stmt = $mysqli->prepare($query);
 
+	/*
 	// delete and create
 	if (isset($unit['overlays'])) {
-		$overlays = array();
-		$maxLayerId = 0;
-		$maxItemId = 0;
-		// determine max id's
-		foreach ($unit['overlays'] as $layer) {
-			if(isset($layer['id'])) {
-				$maxLayerId = max($maxLayerId, $layer['id']);
-				foreach ($layer['items'] as $item) {
-					if(isset($item['id'])) {
-						$maxItemId = max($maxItemId, $item['id']);
-					}
-				}
-			}
-		}
-
-		// then delete and set ids
-		foreach ($unit['overlays'] as $layer) {
-			if (isset($layer['deleted']) && ($layer['deleted'])) {
-				continue;
-			}
-			if (!isset($layer['id'])) {
-				$layer['id'] = ++$maxLayerId;
-			}
-			foreach ($layer['items'] as $item) {
-				if (isset($item['deleted']) && ($item['deleted'])) {
-					continue;
-				}
-				if (!isset($item['id'])) {
-					$item['id'] = ++$maxItemId;
-				}
-			}
-		}
+	$overlays = array();
+	$maxLayerId = 0;
+	$maxItemId = 0;
+	// determine max id's
+	foreach ($unit['overlays'] as $layer) {
+	if (isset($layer['id'])) {
+	$maxLayerId = max($maxLayerId, $layer['id']);
+	foreach ($layer['items'] as $item) {
+	if (isset($item['id'])) {
+	$maxItemId = max($maxItemId, $item['id']);
 	}
+	}
+	}
+	}
+
+	// then delete and set ids
+	foreach ($unit['overlays'] as $layer) {
+	if (isset($layer['deleted']) && ($layer['deleted'])) {
+	continue;
+	}
+	if (!isset($layer['id'])) {
+	$layer['id'] = ++$maxLayerId;
+	}
+	foreach ($layer['items'] as $item) {
+	if (isset($item['deleted']) && ($item['deleted'])) {
+	continue;
+	}
+	if (!isset($item['id'])) {
+	$item['id'] = ++$maxItemId;
+	}
+	}
+	}
+	}
+	 */
 
 	if (!isset($unit['authorId'])) {
 		$unit['authorId'] = 0;
 	}
 	if (!isset($unit['videoId'])) {
 		$unit['videoId'] = "";
+		if ($unit['video']) {
+			$unit['videoId'] = $unit['video']['source'];
+		}
 	}
 	if (!isset($unit['title'])) {
 		$unit['title'] = "";
 	}
-
 	$blob = serialize($unit);
-	$stmt->bind_param("ssisi", $unit['title'], $unit['videoId'], $unit['published'], $blob, $unit['id']);
+	$stmt->bind_param("sssi", $unit['title'], $unit['videoId'], $blob, $unit['id']);
 
 	$stmt->execute();
 	$stmt->close();
 	return $unit;
+}
 
+function updateUnitTitle($unit) {
+	global $mysqli;
+
+	check_unit_privileges($unit['id'], AUTHOR);
+	unset($unit['admin']);
+
+	$query = "UPDATE Units SET title=? WHERE id=?";
+
+	$stmt = $mysqli->prepare($query);
+
+	$stmt->bind_param("si", $unit['title'], $unit['id']);
+
+	$stmt->execute();
+	$stmt->close();
+	return $unit;
 }
 
 function deleteUnit($unitId) {
@@ -180,6 +204,9 @@ function createUnit($unit) {
 	}
 	if (!isset($unit['videoId'])) {
 		$unit['videoId'] = "";
+		if ($unit['video']) {
+			$unit['videoId'] = $unit['video']['source'];
+		}
 	}
 	if (!isset($unit['title'])) {
 		$unit['title'] = "";

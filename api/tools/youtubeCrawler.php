@@ -41,27 +41,26 @@ function fetchPlaylistPage($ytPlaylistId, $start, $authorId, $playlistId) {
 	for ($i = 0; $i < $nVideo; $i++) {
 		$title = $video[$i]['title']['$t'];
 
-		$videoId = $video[$i]['media$group']['yt$videoid']['$t'];
+		$video = $video[$i]['media$group']['yt$video']['$t'];
 
-		$tags = fetchTags($videoId);
+		$tags = fetchTags($video);
 
+		$unitId = insertUnitIfNotExists($title, $video, $tags, $authorId);
+		//echo 'title=' . $title . " video=" . $video . " tags=" . $tags . " authorId=" . $authorId. "unitId=".$unitId;
 
-		$unitId = insertUnitIfNotExists($title, $videoId, $tags, $authorId);
-		//echo 'title=' . $title . " videoId=" . $videoId . " tags=" . $tags . " authorId=" . $authorId. "unitId=".$unitId;
-
-		if($unitId !== false) insertUnitInPlaylist($unitId, $playlistId);
+		if ($unitId !== false) {
+			insertUnitInPlaylist($unitId, $playlistId);
+		}
 
 		//echo "Name: " . $title . '<br/>';
-		//echo "Link: " . $videoId . '<br/>';
+		//echo "Link: " . $video . '<br/>';
 		//echo "Keywords: " . $tags . "<br><br>";
 	}
 	return $nVideo;
 }
 
-
-
-function fetchTags($videoId) {
-	$tags = array('keywords' => ''); //get_meta_tags("https://www.youtube.com/watch?v=" . $videoId); // macht momentan fehler
+function fetchTags($video) {
+	$tags = array('keywords' => ''); //get_meta_tags("https://www.youtube.com/watch?v=" . $video); // macht momentan fehler
 	return $tags['keywords']; // komma getrennt
 }
 
@@ -94,8 +93,6 @@ function fetchPlaylists($userId, $parent) {
 	}
 
 }
-
-
 
 if (isset($_GET['user']) && isset($_GET['parent'])) {
 	fetchPlaylists($_GET['user'], $_GET['parent']);

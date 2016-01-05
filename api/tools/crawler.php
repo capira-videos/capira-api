@@ -24,12 +24,12 @@ function insertUnitInPlaylist($unitId, $channelId) {
 	$stmt->close();
 }
 
-function insertUnitIfNotExists($title, $videoId, $tags, $authorId) {
+function insertUnitIfNotExists($title, $video, $tags, $authorId) {
 	global $mysqli;
 
-	$query = "SELECT * FROM Units WHERE videoId=?";
+	$query = "SELECT * FROM Units WHERE video=?";
 	$stmt = $mysqli->prepare($query);
-	$stmt->bind_param('s', $videoId);
+	$stmt->bind_param('s', $video);
 	$stmt->execute();
 
 	// exists
@@ -39,7 +39,7 @@ function insertUnitIfNotExists($title, $videoId, $tags, $authorId) {
 	}
 	$stmt->close();
 
-	$query = "INSERT INTO Units(title,videoId,authorId) VALUES(?,?,?) ";
+	$query = "INSERT INTO Units(title,video,authorId) VALUES(?,?,?) ";
 
 	/* Prepared statement, stage 1: prepare */
 	if (!($stmt = $mysqli->prepare($query))) {
@@ -47,7 +47,7 @@ function insertUnitIfNotExists($title, $videoId, $tags, $authorId) {
 	}
 
 	/* Prepared statement, stage 2: bind and execute */
-	if (!$stmt->bind_param("sss", $title, $videoId, $authorId)) {
+	if (!$stmt->bind_param("sss", $title, $video, $authorId)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 

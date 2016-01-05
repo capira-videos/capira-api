@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS capira_user_godmode(
         ON DELETE CASCADE
 );
 
-
+DROP TRIGGER IF EXISTS set_last_update_user ON capira_user;
 CREATE TRIGGER set_last_update_user BEFORE UPDATE OR INSERT
 ON capira_user FOR EACH ROW EXECUTE PROCEDURE
 set_update_timestamp();
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS channel(
         ON DELETE CASCADE
 );
 
-
+DROP TRIGGER IF EXISTS set_last_update_channel ON channel;
 CREATE TRIGGER set_last_update_channel BEFORE UPDATE OR INSERT
     ON channel FOR EACH ROW EXECUTE PROCEDURE
     set_update_timestamp();
@@ -92,7 +92,7 @@ CREATE TYPE video_type AS ENUM ('yt','html5');
 CREATE TABLE IF NOT EXISTS video(
     id INTEGER NOT NULL UNIQUE,
     src VARCHAR(255),
-    type video_type NOT NULL,
+    type video_type NOT NULL DEFAULT 'yt',
     FOREIGN KEY(id) 
         REFERENCES lesson(id) 
         ON DELETE CASCADE
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS video(
 
 
 
-
+DROP TRIGGER IF EXISTS set_last_update_lesson ON lesson;
 CREATE TRIGGER set_last_update_lesson BEFORE UPDATE OR INSERT
     ON lesson FOR EACH ROW EXECUTE PROCEDURE
     set_update_timestamp();
@@ -138,7 +138,7 @@ CREATE TYPE overlay_type AS ENUM (
 CREATE TABLE IF NOT EXISTS overlay(
     id INTEGER NOT NULL UNIQUE,
     lesson_id INTEGER NOT NULL,
-    type overlay_type NOT NULL,
+    type overlay_type NOT NULL DEFAULT 'standard-annotation',
     background_color VARCHAR(32),     /* most extream value: rgba(255,255,255,0.123123) */
     background_image VARCHAR(512),    /* url */
     FOREIGN KEY(id) 
@@ -189,7 +189,7 @@ CREATE TYPE reaction_type AS ENUM ('repeat','play','seek-to','show-overlay','sho
 CREATE TABLE IF NOT EXISTS reaction(
     id SERIAL PRIMARY KEY,
     content_id INTEGER NOT NULL,
-    type reaction_type NOT NULL,
+    type reaction_type NOT NULL DEFAULT 'repeat',
     FOREIGN KEY(content_id) 
         REFERENCES content(id) 
         ON DELETE CASCADE
@@ -357,7 +357,7 @@ CREATE TABLE IF NOT EXISTS interaction(
 CREATE TYPE lesson_interaction_type AS ENUM ('started','ended');
 CREATE TABLE IF NOT EXISTS lesson_interaction(
     id INTEGER NOT NULL UNIQUE,
-    type lesson_interaction_type NOT NULL,
+    type lesson_interaction_type NOT NULL DEFAULT 'started',
     FOREIGN KEY(id)
         REFERENCES interaction(id)
         ON DELETE CASCADE
@@ -368,7 +368,7 @@ CREATE TABLE IF NOT EXISTS lesson_interaction(
 CREATE TYPE video_interaction_type AS ENUM ('play','pause','playing','seek-to','velocity');
 CREATE TABLE IF NOT EXISTS video_interaction(
     id INTEGER NOT NULL UNIQUE,
-    type video_interaction_type NOT NULL,
+    type video_interaction_type NOT NULL DEFAULT 'play',
     keyframe DECIMAL(10,3),
     FOREIGN KEY(id)
         REFERENCES interaction(id)
@@ -381,7 +381,7 @@ CREATE TYPE overlay_interaction_type AS ENUM ('show','hide','skip');
 
 CREATE TABLE IF NOT EXISTS overlay_interaction(
     id INTEGER NOT NULL UNIQUE,
-    type overlay_interaction_type,
+    type overlay_interaction_type DEFAULT 'show',
     FOREIGN KEY(id)
         REFERENCES interaction(id)
         ON DELETE CASCADE
@@ -513,6 +513,15 @@ CREATE TRIGGER insert_lesson_trigger BEFORE INSERT ON lesson
 $$ delimiter ;
 */
 
+TRUNCATE capira_user_profile CASCADE;
+TRUNCATE capira_user CASCADE;
+TRUNCATE content CASCADE;
+TRUNCATE content_hirachic CASCADE;
+TRUNCATE channel CASCADE;
+TRUNCATE lesson CASCADE;
+TRUNCATE video CASCADE;
+TRUNCATE overlay CASCADE;
+TRUNCATE quiz CASCADE;
 
 -- test users
 INSERT INTO capira_user (session_token) VALUES('session_token-1');
@@ -524,17 +533,17 @@ INSERT INTO capira_user_godmode (id) VALUES(LASTVAL());
 
 -- test channels
 INSERT INTO content (created_at) VALUES(default);
-INSERT INTO content_hirachic (id,parent,instructor) VALUES(LASTVAL(),LASTVAL(),1);
+INSERT INTO content_hirachic (id,parent,instructor) VALUES(LASTVAL(),LASTVAL(),(SELECT id FROM capira_user LIMIT 1));
 INSERT INTO channel (id,title) VALUES(LASTVAL(),'channel-title-1');
 
 INSERT INTO content (created_at) VALUES(default);
-INSERT INTO content_hirachic (id,parent,instructor) VALUES(LASTVAL(),1,1);
+INSERT INTO content_hirachic (id,parent,instructor) VALUES(LASTVAL(),(SELECT id FROM content LIMIT 1),(SELECT id FROM capira_user LIMIT 1));
 INSERT INTO channel (id,title) VALUES(LASTVAL(),'channel-title-2');
 
 
 -- test lesson 
 INSERT INTO content (created_at) VALUES(default);
-INSERT INTO content_hirachic (id,parent,instructor) VALUES(LASTVAL(),1,1);
+INSERT INTO content_hirachic (id,parent,instructor) VALUES(LASTVAL(),(SELECT id FROM content LIMIT 1),(SELECT id FROM capira_user LIMIT 1));
 INSERT INTO lesson (id) VALUES(LASTVAL()); 
 INSERT INTO video (id,src) VALUES(LASTVAL(),'aZCIa2sdf'); 
 

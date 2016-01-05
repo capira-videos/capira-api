@@ -12,7 +12,7 @@ require 'vendor/autoload.php';
 
 $app = new \Slim\Slim();
 $app->add(new \Slim\Middleware\ContentTypes());
-$app->contentType('application/json');
+$app->contentType('application/json; charset=utf-8');
 
 include 'routes/user-api.php';
 include 'routes/channel-api.php';

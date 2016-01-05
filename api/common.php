@@ -1,15 +1,16 @@
 <?php
-
+session_name('capira_v3');
 session_set_cookie_params(3600 * 24 * 30, '/');
 // important
 session_start();
+ob_start('ob_gzhandler');
 
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+//error_reporting(E_ALL);
+//ini_set("display_errors", 1);
 
 define('VALID_INCLUDE', true);
 
-$mysqli = new mysqli('sql379.your-server.de', 'capira_2_w', 's9Bn3Jg62bM1B6V8', 'capira_db2');
+$mysqli = new mysqli('sql321.your-server.de', 'capiran_1_w', 'A5bMzW8SKrNnKK3V', 'capiran_db1');
 if ($mysqli->connect_errno) {
 	echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
 }
